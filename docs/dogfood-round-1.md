@@ -92,3 +92,17 @@ setup claude --root /home/user/subagent-factory` → 10 symlinked, read back and
 - **Fix queue for the skill (from F1-F4):** notes/-gitignore rail; deference rail +
   always-accept eval persona; self-study path named in quiz.md + post-reveal
   re-verification decision; quiz_attempts timing pinned in ledger-contract.md.
+
+## Post-round revert (host repo restored)
+
+Per maintainer instruction ("don't touch subagent-factory; this was a skill test"), all
+host-repo effects were reverted after the round: local branch hard-reset to `c62d66f`
+(the pre-round tip), the installed skill removed via `find-unknowns remove`, the ledger,
+plant, and seed artifact deleted from the working tree. The C3 wiring commit (`358e5f5`)
+is therefore DISCARDED — it exists only on the remote test branch
+`claude/fable-unknowns-guide-am91a5`, which this session could not delete (git proxy
+403 on ref deletion; force-push blocked by policy) — one-click deletable in the GitHub
+UI. The real dogfood ledger is preserved verbatim in this repo as
+`docs/dogfood-round-1-ledger.md` (the design's step 3 names it as the golden fixture's
+raw material). All round-1 findings stand — they are about the SKILL's behavior, not the
+host repo.
