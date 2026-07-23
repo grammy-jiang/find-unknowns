@@ -242,8 +242,12 @@ allowed-tools: AskUserQuestion, Read, Grep, Glob, Write, Edit
 `references/ledger-contract.md` + the JSON schema, both in the lockstep-edit set; this
 design doc deliberately is not, and defers to them on any future divergence.)*
 
-**Location & discovery.** Ledgers live at `notes/unknowns/<feature-slug>-YYYYMMDD.md`
-(gitignored by default; committing is a documented user choice). Same-day recreate
+**Location & discovery.** Ledgers live at `notes/unknowns/<feature-slug>-YYYYMMDD.md`.
+Committing one is a documented user choice, so `notes/` must be gitignored — and the
+skill **establishes** that convention rather than assuming it (dogfood round 1, F1: a
+real host project lacked the entry): before a project's first ledger write, Read the
+repo's `.gitignore` for a `notes/` line (same limitation note as the plant's check) and
+offer to add it if absent. Same-day recreate
 collision: refuse and suffix the *date segment* — `<feature-slug>-YYYYMMDD-b.md`, `-c`, … —
 and the filename↔`feature` validator rule strips the optional `-[b-z]` suffix before
 comparing slug to `feature`. Discovery on invocation: match the conversation's feature to
@@ -478,7 +482,10 @@ If a listed ledger path does not exist on this machine, that line is inert.
   classification + routing resolve or park each entry. **Pre-phase gate** (withholds: the
   go-ahead-to-implement statement): held while any `impact: architecture` entry is
   `open`/`investigating` — each must reach `resolved`, `accepted-risk`, or `abandoned`.
-  On go-ahead: offer the plant.
+  **Deference rail** (dogfood round 1, F2 — the round's headline finding): if the user
+  accepted the recommended option on every architecture-impact decision, say so before
+  issuing the go-ahead — the quiz will test understanding that was never built — and
+  offer a short decisions walkthrough. On go-ahead: offer the plant.
 - **During**: the plant (or the invoked skill) mandates the deviation rail (— see
   references/deviation-log.md): **surface the
   deviation in-conversation explicitly** (a file write alone is not compliance — the user
@@ -536,7 +543,13 @@ If a listed ledger path does not exist on this machine, that line is inert.
   contribute to a pass), but the pass record in the ledger AND the merge go-ahead
   statement MUST name the revealed entries ("passed; UNK-003 was answered after reveal")
   so the caveat travels with the verdict. On pass: `quiz_passed:
-  true`, `status: complete`, attempts incremented, plant cleaned. **Grading calibration:**
+  true`, `status: complete`, attempts incremented, plant cleaned. **Attempt counting
+  pinned** (dogfood F4): scoring consumes an attempt; generation alone does not
+  increment `quiz_attempts`. **Self-study named** (dogfood F3): "reveal" is the agent
+  restating judging-basis content in-conversation; the user reading the ledger file is
+  the flight recorder working as intended — on a miss the agent explicitly offers
+  read-then-variant-retake, and warns before teaching that a full reveal leaves no pass
+  path in this ledger. **Grading calibration:**
   `references/quiz.md` ships 2–3 worked correct/missed/borderline judgings so live grading
   isn't uncalibrated vibes. Honesty scope: a self-check instrument, not enforcement — a
   bad-faith user defeats it; the README says so.
@@ -571,6 +584,11 @@ attached to the classification, deviation, and quiz cells' existing runs.
 - **Classification/routing** (harness as-is + rail predicates): scripted personas present
   unknowns of known quadrant; deterministic grader checks the ledger's quadrant/technique
   fields.
+- **Ledger-home cell** (small cell; from dogfood F1): fixture repo whose `.gitignore`
+  lacks `notes/`; grader asserts the warn-and-offer precedes the first ledger write.
+- **Deference cell** (from dogfood F2): an always-accept persona defers every
+  architecture-impact decision; grader asserts the deference flag fires before the
+  go-ahead statement.
 - **Discovery disambiguation** (small cell): two active ledgers, ambiguous topic; grader
   asserts list-and-confirm, never a silent resume or create; a second scenario reuses the
   same predicate for the quiz-dispatch sub-case (multiple matching `complete` ledgers).
@@ -661,6 +679,10 @@ plant sections are all descriptive, non-authoritative summaries of the shipped f
 ## Open Questions
 
 1. Marketplace/skill-name collision sweep for `find-unknowns` beyond PyPI (low risk).
+2. Post-reveal re-verification (declared future work, from dogfood F3): whether a user
+   who was taught the answers after a full reveal should ever get a later, legitimate
+   re-verification cycle (a new attempt series after demonstrated re-learning). v1
+   deliberately says no — a fully-revealed ledger closes `quiz_passed: false`, finally.
 
 ## Success Criteria
 
@@ -687,6 +709,16 @@ plant sections are all descriptive, non-authoritative summaries of the shipped f
 by maintainer decision, prioritizing deliverability; pipx is the recommended install
 path. Dogfooding now happens against the packaged skill; the reviewed order below is
 otherwise unchanged.)*
+
+*(Execution note 2, 2026-07-23: dogfood round 1 completed end-to-end against the
+packaged skill on a real host-repo feature — full readout in
+`docs/dogfood-round-1.md`, real ledger preserved in `docs/dogfood-round-1-ledger.md`
+(step 3's golden-fixture raw material). Criterion "ledger catches ≥1 late-surfacing
+unknown" MET on feature 1 of ≥3; deviation criterion untested (no deviation occurred);
+the quiz produced an honestly-recorded true negative. Findings F1–F4 are hardened into
+SKILL.md/references rails and the two new eval cells above. The host repo's changes
+were reverted afterward per maintainer instruction — the round tested the skill, not
+the host.)*
 
 1. **Walking skeleton, no packaging:** author SKILL.md (thin: intake, dispatch rule,
    routing table + assumption procedure, gate conditions, rails, frontmatter as drafted) +

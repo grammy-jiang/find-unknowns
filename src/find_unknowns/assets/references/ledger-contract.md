@@ -6,9 +6,12 @@ deterministic validator arrive in a later milestone and must match this file exa
 
 ## Location, naming, discovery
 
-- One ledger per feature: `notes/unknowns/<feature-slug>-YYYYMMDD.md`. The `notes/`
-  directory is gitignored by default — ledgers are private working notes; committing one
-  is a deliberate per-user choice.
+- One ledger per feature: `notes/unknowns/<feature-slug>-YYYYMMDD.md`. Ledgers are
+  private working notes; committing one is a deliberate per-user choice — so `notes/`
+  must be gitignored, and **the skill establishes that convention rather than assuming
+  it**: before a project's first ledger write, Read the repo's `.gitignore` for a
+  `notes/` line (limitation: nested `.gitignore`s and global excludes are invisible to
+  this check — say so if it matters) and, if absent, warn and offer to add it.
 - The filename's feature slug MUST equal the frontmatter `feature` value.
 - Same-day recreate collision: refuse to overwrite; suffix the date segment —
   `<feature-slug>-YYYYMMDD-b.md`, then `-c`, and so on. When comparing filename to
@@ -100,6 +103,11 @@ feature's ledger.
 These follow from the quiz flow in references/quiz.md — restated for static checking:
 `quiz_passed: true` ⇒ `quiz_attempts ≥ 1` ∧ at least one `## Quiz — attempt N` section ∧
 ledger `status: complete` ∧ zero `open`/`investigating` entries.
+
+**Attempt counting is pinned:** `quiz_attempts` counts SCORED attempts — scoring an
+attempt increments it; generating questions alone does not. (A generated-but-unscored
+`## Quiz — attempt N` section with `quiz_attempts` one lower is therefore a legal
+in-progress state, not a violation.)
 
 ## Worked examples
 

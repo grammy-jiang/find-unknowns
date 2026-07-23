@@ -71,6 +71,16 @@ examples:
 3. Any entry re-asked **after** its answer was revealed scores `passed-after-reveal`.
 4. **Cap: 3 attempts per ledger — a hard ceiling.** No `## Quiz — attempt 4` section is
    ever written, and no further quiz section after a fully-revealed closure either.
+   Scoring consumes an attempt; generation alone does not increment `quiz_attempts`.
+
+**Self-study is legitimate — offer it on a missed attempt.** "Reveal" means the AGENT
+restating judging-basis content in-conversation; the user reading the ledger file itself
+is the flight recorder working as intended, not gaming. On a miss, explicitly offer:
+"read the ledger (its resolutions are the record), then take a variant retake" — that
+path can still reach a clean pass. Warn before teaching instead: once every entry's
+answer has been revealed in-conversation, NO pass path remains in this ledger (a
+deliberate property; a post-reveal re-verification mechanism is documented future work,
+not a silent gap).
 
 ## Pass computation — the single authoritative rule
 

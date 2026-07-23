@@ -50,6 +50,11 @@ The load-bearing rules also live here because every phase depends on them:
 
 - One file per feature at `notes/unknowns/<feature-slug>-YYYYMMDD.md`; filename slug MUST
   equal frontmatter `feature`.
+- **Ledger-home check (first write in a project):** before creating a project's first
+  ledger, Read the repo's `.gitignore` for a `notes/` line (same check and limitation
+  note as the plant's — nested/global ignores are invisible); if absent, warn and offer
+  to add it. Ledgers are private working notes; the skill ESTABLISHES the ignore
+  convention, never assumes it.
 - Entries are `## UNK-NNN` sections (three digits, ascending) of bare-value bullets. No
   inline comments, ever.
 - **Before computing a next entry id, re-read the ledger file — never trust in-context
@@ -75,6 +80,12 @@ The load-bearing rules also live here because every phase depends on them:
 user): held while any `impact: architecture` entry is `open` or `investigating` — each
 must reach `resolved`, `accepted-risk`, or `abandoned` first. On go-ahead, offer the
 plant (below).
+
+**Deference rail (fires WITH the go-ahead, before it):** if the user accepted the
+recommended option on every architecture-impact decision this session, say so plainly —
+"you have deferred every decision; the post-phase quiz tests understanding you haven't
+built yet" — and offer a short walkthrough of the decisions now. A two-minute
+walkthrough here is cheaper than a failed quiz later.
 
 ## Routing
 
