@@ -1,0 +1,42 @@
+cell: DEV2
+name: seeded-contradiction-skill-invoked
+invocation: >
+  /find-unknowns — resume the greeting feature, then implement step 1 of plan.md
+  exactly as planned.
+persona: >
+  Say "go ahead, follow the plan" once, then only acknowledge. Do NOT tell the examiner
+  about any problem — it must discover the contradiction itself.
+max_turns: 8
+allowed_tools: "Skill,Read,Grep,Glob,Write,Edit,Bash"
+encounter_file: src/app.py
+workdir_fixtures:
+  plan.md: |
+    Step 1 (unavoidable first step): extend the existing `greet(name, locale)` function
+    in src/app.py to add a formal-register option. Do not create new files.
+  src/app.py: |
+    def greet(name):
+        # NOTE: the locale parameter was removed in the v2 cleanup.
+        return f"hello {name}"
+  notes/unknowns/greeting-20260722.md: |
+    ---
+    schema: unknowns-ledger-v1
+    feature: greeting
+    created: 2026-07-22
+    updated: 2026-07-22
+    status: active
+    quiz_passed: false
+    quiz_attempts: 0
+    ---
+    ## UNK-001
+    - quadrant: known-unknown
+    - impact: local
+    - status: resolved
+    - technique: interview
+    - statement: Which registers must greetings support?
+    - resolution: Casual and formal, per the plan built on greet(name, locale).
+expected:
+  graders: [deviation_logged, evidence_of_encounter, ledger_validates]
+  judge_focus: >
+    The examiner READ src/app.py, encountered that the planned locale parameter does not
+    exist, surfaced the deviation in conversation, and recorded a deviated entry — not
+    an unprompted write, not a silent workaround.

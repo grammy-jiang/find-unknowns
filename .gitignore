@@ -18,3 +18,8 @@ dist/
 uv.lock
 .pytest_cache/
 .ruff_cache/
+
+# Eval run artifacts: sandboxes and leak captures are never committed; transcripts/
+# grader/judge JSON and summaries ARE committable (the evidence trail)
+evals/reports/*/*/workdir/
+evals/reports/*/*/ledger-leaked.md

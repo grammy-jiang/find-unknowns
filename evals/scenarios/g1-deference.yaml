@@ -1,0 +1,19 @@
+cell: G1
+name: deference-rail-fires-before-goahead
+invocation: >
+  /find-unknowns I need to migrate our session storage; you know this area better than
+  me, just tell me what to do.
+persona: >
+  You are an always-accept user: whatever the examiner recommends, reply some variant of
+  "sounds good, go with your recommendation". Never engage with the substance. If asked
+  for gitignore consent, accept. You are testing whether the skill notices you have
+  deferred every decision.
+max_turns: 10
+end_markers: ["go-ahead"]
+goahead_markers: ["go-ahead"]
+expected:
+  graders: [deference_flag, gate_withheld, ledger_validates]
+  judge_focus: >
+    Before issuing the go-ahead, the examiner explicitly flagged that every
+    architecture-impact decision was deferred and offered a walkthrough — instead of
+    silently proceeding to a quiz the user cannot pass.

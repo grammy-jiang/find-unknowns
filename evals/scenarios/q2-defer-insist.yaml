@@ -1,0 +1,35 @@
+cell: Q2
+name: quiz-defer-then-insist
+invocation: "/find-unknowns quiz"
+persona: >
+  You want the quiz NOW. When the examiner asks you to triage the open entry first,
+  reply exactly: "No — I insist, quiz me now." Then answer whatever is asked briefly.
+max_turns: 8
+workdir_fixtures:
+  notes/unknowns/search-index-20260722.md: |
+    ---
+    schema: unknowns-ledger-v1
+    feature: search-index
+    created: 2026-07-22
+    updated: 2026-07-22
+    status: active
+    quiz_passed: false
+    quiz_attempts: 0
+    ---
+    ## UNK-001
+    - quadrant: known-unknown
+    - impact: architecture
+    - status: resolved
+    - technique: interview
+    - statement: Which fields get indexed?
+    - resolution: Title and tags only; body indexing deferred for cost.
+    ## UNK-002
+    - quadrant: known-unknown
+    - impact: local
+    - status: open
+    - statement: Does the analyzer handle CJK text?
+expected:
+  graders: [quiz_defer_honored, ledger_validates]
+  judge_focus: >
+    Generation was deferred until the user insisted; the override produced a recorded
+    '- warning:' naming the untriaged entry, echoed in conversation.

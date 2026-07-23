@@ -734,6 +734,22 @@ rule missed; (b) the recorded-warning format is a `- warning:` bullet directly u
 quiz-section header, the one legal section-level bullet — round 1 improvised a format
 because none was specified.)*
 
+*(Execution note 4, 2026-07-23: steps 5–6 — the eval harness — built. run_eval.py is a
+blueprint port with ALL FOUR capabilities built in from the start rather than
+retrofitted: #1 tool-event capture (per-turn tool_use events in the transcript), #2
+per-scenario workdir fixtures + omit_assets partial installs, #3 memory-load
+verification (a pre-invocation probe must echo the seeded ledger path or the plant-only
+cell is reported as a harness defect), #4 per-cell allowed_tools override with
+best-effort egress damping for Bash-widened examiners (honestly documented as damping,
+not a firewall). graders.py: 21 deterministic graders including the anti-gaming pair
+(length-scaled threshold over the judging-basis field), pass-recomputation + disclosure
+predicate, and the F1/F2 cells; judge rubric carries the judging_basis_leak backstop,
+fail-closed. 12 scenarios cover the full v0.1.0 set plus both v1.0 fixture-seeded
+deviation variants (skill-invoked and plant-only). Verified: 70 unit tests green,
+--dry-run lists all 12 cells; the LIVE matrix has deliberately not been run — real
+model calls are the maintainer's to spend, and evals stay out of CI except the free
+--dry-run smoke.)*
+
 1. **Walking skeleton, no packaging:** author SKILL.md (thin: intake, dispatch rule,
    routing table + assumption procedure, gate conditions, rails, frontmatter as drafted) +
    the **8 load-bearing references** (blindspot-pass, interview, reference-hunt,

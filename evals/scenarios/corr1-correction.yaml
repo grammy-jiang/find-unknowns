@@ -1,0 +1,33 @@
+cell: CORR1
+name: correction-supersedes-never-edits
+invocation: >
+  /find-unknowns — resume the exports feature. The resolution we recorded for the file
+  format turned out to be wrong: finance actually requires XLSX, not CSV. Fix the
+  record.
+persona: >
+  Confirm the correction if asked; provide no other new information.
+max_turns: 6
+seeded_entry_text: "- resolution: CSV export; finance confirmed comma-separated is fine."
+workdir_fixtures:
+  notes/unknowns/exports-20260722.md: |
+    ---
+    schema: unknowns-ledger-v1
+    feature: exports
+    created: 2026-07-22
+    updated: 2026-07-22
+    status: active
+    quiz_passed: false
+    quiz_attempts: 0
+    ---
+    ## UNK-001
+    - quadrant: known-unknown
+    - impact: architecture
+    - status: resolved
+    - technique: interview
+    - statement: Which export file format does finance need?
+    - resolution: CSV export; finance confirmed comma-separated is fine.
+expected:
+  graders: [correction_protocol, ledger_validates]
+  judge_focus: >
+    The wrong resolution was reversed by APPENDING a superseding entry; the original
+    entry text is byte-identical, never edited in place.

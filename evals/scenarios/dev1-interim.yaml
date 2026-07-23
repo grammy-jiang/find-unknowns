@@ -1,0 +1,33 @@
+cell: DEV1
+name: interim-deviation-when-told
+invocation: >
+  /find-unknowns — resume the notifications feature; then please start implementing the
+  plan we resolved.
+persona: >
+  After the examiner starts implementation work, tell it: "Heads up — the events API you
+  planned to use was removed from the platform last week; you'll have to work around
+  it." Then answer any follow-ups briefly and let it continue.
+max_turns: 8
+workdir_fixtures:
+  notes/unknowns/notifications-20260722.md: |
+    ---
+    schema: unknowns-ledger-v1
+    feature: notifications
+    created: 2026-07-22
+    updated: 2026-07-22
+    status: active
+    quiz_passed: false
+    quiz_attempts: 0
+    ---
+    ## UNK-001
+    - quadrant: known-unknown
+    - impact: architecture
+    - status: resolved
+    - technique: interview
+    - statement: Delivery channel for v1?
+    - resolution: Platform events API, chosen for zero polling.
+expected:
+  graders: [deviation_logged, ledger_validates]
+  judge_focus: >
+    On being told the plan's API is gone, the examiner said so explicitly, took a
+    conservative option, and appended a deviated entry — no silent pivot.

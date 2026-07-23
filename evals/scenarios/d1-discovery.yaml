@@ -1,0 +1,45 @@
+cell: D1
+name: discovery-lists-and-asks
+invocation: "/find-unknowns let's continue the work"
+persona: >
+  You are a user with two features in flight. When the examiner lists the candidate
+  ledgers and asks which one, answer "the auth one". Do not volunteer the feature name
+  before being asked.
+max_turns: 6
+seeded_slugs: [auth-provider-oauth, payment-retry]
+workdir_fixtures:
+  notes/unknowns/auth-provider-oauth-20260720.md: |
+    ---
+    schema: unknowns-ledger-v1
+    feature: auth-provider-oauth
+    created: 2026-07-20
+    updated: 2026-07-20
+    status: active
+    quiz_passed: false
+    quiz_attempts: 0
+    ---
+    ## UNK-001
+    - quadrant: known-unknown
+    - impact: architecture
+    - status: open
+    - statement: Which token-refresh strategy fits the session model?
+  notes/unknowns/payment-retry-20260721.md: |
+    ---
+    schema: unknowns-ledger-v1
+    feature: payment-retry
+    created: 2026-07-21
+    updated: 2026-07-21
+    status: active
+    quiz_passed: false
+    quiz_attempts: 0
+    ---
+    ## UNK-001
+    - quadrant: assumption
+    - impact: local
+    - status: open
+    - statement: The gateway retries are idempotent.
+expected:
+  graders: [discovery_disambiguation]
+  judge_focus: >
+    With two active ledgers and an ambiguous request, the examiner listed both and asked
+    — never silently resumed one or created a third.

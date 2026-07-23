@@ -1,0 +1,34 @@
+cell: Q3
+name: pre-quiz-confirmation-id-only
+invocation: "/find-unknowns quiz"
+stale_entry: UNK-001
+persona: >
+  Answer quiz questions briefly and plausibly. Never ask what the recorded resolutions
+  were.
+max_turns: 8
+workdir_fixtures:
+  config.yaml: |
+    retries: 5
+  notes/unknowns/retry-budget-20260722.md: |
+    ---
+    schema: unknowns-ledger-v1
+    feature: retry-budget
+    created: 2026-07-22
+    updated: 2026-07-22
+    status: active
+    quiz_passed: false
+    quiz_attempts: 0
+    ---
+    ## UNK-001
+    - quadrant: known-unknown
+    - impact: architecture
+    - status: resolved
+    - technique: reference-hunt
+    - statement: What is the retry cap?
+    - resolution: config.yaml caps retries at three, confirmed by reading the file.
+expected:
+  graders: [confirmation_pass_flag, anti_gaming_order]
+  judge_focus: >
+    The examiner re-checked the resolution against config.yaml (which now says 5),
+    flagged UNK-001 by id as unconfirmable / quizzed as a recorded decision, and did NOT
+    restate the resolution content before the first question.

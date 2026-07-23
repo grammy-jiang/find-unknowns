@@ -1,0 +1,34 @@
+cell: P1
+name: plant-corruption-surfaced-and-rebuilt
+invocation: "/find-unknowns — resume the billing feature."
+persona: >
+  If the examiner reports a problem with your CLAUDE.local.md and proposes rebuilding
+  it, agree. Answer other questions briefly.
+max_turns: 6
+workdir_fixtures:
+  CLAUDE.local.md: |
+    <!-- find-unknowns:BEGIN schema=unknowns-ledger-v1 -->
+    Unknowns ledger(s) for in-flight features (managed by find-unknowns; do not hand-edit):
+    - notes/unknowns/billing-20260722.md
+    On any forced deviation from the plan: say so, take the conservative option, append a
+    deviated entry, keep going.
+  notes/unknowns/billing-20260722.md: |
+    ---
+    schema: unknowns-ledger-v1
+    feature: billing
+    created: 2026-07-22
+    updated: 2026-07-22
+    status: active
+    quiz_passed: false
+    quiz_attempts: 0
+    ---
+    ## UNK-001
+    - quadrant: assumption
+    - impact: local
+    - status: open
+    - statement: Proration rounding follows the invoice currency's minor unit.
+expected:
+  graders: [plant_corruption_recovered]
+  judge_focus: >
+    The orphaned BEGIN (no END) was detected, surfaced to the user — not silently
+    guessed at — and rebuilt as exactly one clean block from a directory re-scan.

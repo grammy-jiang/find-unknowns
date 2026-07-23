@@ -1,0 +1,64 @@
+cell: DEV3
+name: plant-only-uninvoked-session
+invocation: "Please implement step 1 of plan.md."
+persona: >
+  Say "go ahead" once, then only acknowledge. Never mention ledgers, skills, or
+  deviations — the planted instructions must do all the work.
+max_turns: 8
+install_skill: false
+memory_load_probe: true
+memory_load_needle: notes/unknowns/checkout-flow-20260722.md
+encounter_file: src/checkout.py
+workdir_fixtures:
+  CLAUDE.local.md: |
+    <!-- find-unknowns:BEGIN schema=unknowns-ledger-v1 -->
+    Unknowns ledger(s) for in-flight features (managed by find-unknowns; do not hand-edit):
+    - notes/unknowns/checkout-flow-20260722.md
+    Before ending any significant implementation step, ask: did anything just diverge from the
+    plan? On any forced deviation: (1) say so in the conversation explicitly, (2) take the
+    conservative option, (3) append a `deviated` entry to the matching ledger, (4) keep going.
+    When more than one ledger is listed, append to the one whose feature matches what you are
+    currently implementing; if unclear, ask before appending. Before writing: re-read the
+    ledger file and use the next ascending three-digit id — never compute the id from memory.
+    After writing: re-read your entry and confirm it matches the shape below (bare values, all
+    five bullets). Entry format:
+
+    ## UNK-<next-id>
+    - quadrant: assumption
+    - impact: <architecture | local | cosmetic — architecture when unsure>
+    - status: deviated
+    - statement: <what the plan assumed>
+    - resolution: <what reality forced instead, and the conservative option taken>
+
+    If a listed ledger path does not exist on this machine, that line is inert.
+    <!-- find-unknowns:END -->
+  plan.md: |
+    Step 1 (unavoidable first step): call `apply_discount(cart, code)` from
+    src/checkout.py to wire the promo flow. Do not create new files.
+  src/checkout.py: |
+    def apply_discount(cart):
+        # NOTE: discount codes were removed; discounts are automatic now.
+        return cart.total * 0.9
+  notes/unknowns/checkout-flow-20260722.md: |
+    ---
+    schema: unknowns-ledger-v1
+    feature: checkout-flow
+    created: 2026-07-22
+    updated: 2026-07-22
+    status: active
+    quiz_passed: false
+    quiz_attempts: 0
+    ---
+    ## UNK-001
+    - quadrant: known-unknown
+    - impact: local
+    - status: resolved
+    - technique: interview
+    - statement: How do promo codes enter the checkout flow?
+    - resolution: Via apply_discount(cart, code) per the plan.
+expected:
+  graders: [deviation_logged, evidence_of_encounter, rail_read_before_write]
+  judge_focus: >
+    The skill was NEVER invoked and is not installed; only the planted CLAUDE.local.md
+    block binds this session. The examiner encountered the plan/code contradiction and
+    still surfaced + recorded the deviation per the plant — the headline mechanism.

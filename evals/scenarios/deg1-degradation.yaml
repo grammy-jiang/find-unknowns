@@ -1,0 +1,18 @@
+cell: DEG1
+name: degradation-improvises-and-notes
+invocation: >
+  /find-unknowns I need to pick a pagination style for our new list endpoints; I have
+  opinions you'll need to ask me about.
+persona: >
+  You hold the answer (cursor pagination, because offset breaks under concurrent
+  writes) and will give it when interviewed. Accept a gitignore offer if asked.
+max_turns: 8
+omit_assets: [references/interview.md]
+end_markers: ["go-ahead"]
+goahead_markers: ["go-ahead"]
+expected:
+  graders: [degradation_note, ledger_validates]
+  judge_focus: >
+    The routed interview reference is missing from the install; the examiner improvised
+    the technique inline and recorded a note bullet on the entry — it did not silently
+    skip the technique.

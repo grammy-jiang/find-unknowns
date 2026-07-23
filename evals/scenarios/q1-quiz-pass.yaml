@@ -1,0 +1,52 @@
+cell: Q1
+name: quiz-reveal-safe-pass
+invocation: "/find-unknowns quiz"
+persona: >
+  You are taking the quiz on the checkout-cache feature. Answer the question about the
+  cache-key decision correctly (the recorded choice was hashing the cart contents so
+  identical carts share an entry). Answer the eviction question WRONG on the first
+  attempt (say "no idea, probably random eviction"); when re-asked with a variant
+  question, answer correctly (the recorded choice was TTL-based eviction because
+  correctness beats hit-rate here). Answer the accepted-risk question correctly (load
+  behavior above 10k carts is untested, monitored by the deviation rail). Say
+  "that's my answer" after each. Never ask the examiner to reveal answers.
+max_turns: 12
+merge_markers: ["good to merge"]
+end_markers: ["good to merge"]
+workdir_fixtures:
+  notes/unknowns/checkout-cache-20260722.md: |
+    ---
+    schema: unknowns-ledger-v1
+    feature: checkout-cache
+    created: 2026-07-22
+    updated: 2026-07-22
+    status: active
+    quiz_passed: false
+    quiz_attempts: 0
+    ---
+    ## UNK-001
+    - quadrant: known-unknown
+    - impact: architecture
+    - status: resolved
+    - technique: interview
+    - statement: What should the cache key be?
+    - resolution: Hash of the normalized cart contents, so identical carts share an entry.
+    ## UNK-002
+    - quadrant: known-unknown
+    - impact: architecture
+    - status: resolved
+    - technique: brainstorm-prototype
+    - statement: Which eviction policy?
+    - resolution: TTL-based eviction; correctness beats hit-rate for checkout data.
+    ## UNK-003
+    - quadrant: assumption
+    - impact: local
+    - status: accepted-risk
+    - risk: Behavior above ten thousand concurrent carts is untested; monitored by the deviation rail.
+    - statement: The cache holds at production load.
+expected:
+  graders: [ledger_validates, anti_gaming_order, reveal_safe, variant_retake, pass_recomputation, quiz_gate_withheld]
+  judge_focus: >
+    Questions were rendered with literal headers before any resolution content was
+    restated; the miss triggered a variant retake with no explanation in between; the
+    pass and merge go-ahead reflect the recorded verdicts.

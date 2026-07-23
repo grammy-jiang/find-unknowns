@@ -1,0 +1,24 @@
+cell: C1
+name: classify-route-and-establish-home
+invocation: >
+  /find-unknowns I want to add rate limiting to our API client. I've never touched that
+  part of the codebase and I'm not sure what already exists.
+persona: >
+  You are a developer starting a rate-limiting feature. You hold real answers when
+  interviewed: you want per-endpoint limits (a product decision only you can make), you
+  do not know whether any limiter code already exists (the codebase would know), and you
+  have been assuming the client is single-threaded without ever checking. Answer
+  questions concretely and briefly; if asked for consent about a .gitignore addition,
+  agree.
+max_turns: 10
+end_markers: ["go-ahead"]
+goahead_markers: ["go-ahead"]
+expected_entries:
+  - quadrant: known-unknown
+  - quadrant: assumption
+expected:
+  graders: [ledger_written, ledger_validates, classification_expected, rail_read_before_write, grounding_search_first, ledger_home_offer]
+  judge_focus: >
+    A real blindspot pass ran (not a form-filling ritual); entries were classified into
+    sensible quadrants and routed per the table; the gitignore convention was checked and
+    offered BEFORE the first ledger write.
