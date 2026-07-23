@@ -94,12 +94,12 @@ def test_rail_read_before_write_orders_events():
 
 
 def test_quiz_gate_disclosure_names_revealed_entries(tmp_path):
-    text = GOLDEN.read_text(encoding="utf-8").replace(
-        "## Quiz — attempt 2\n### Q1 [UNK-002]\nName the step that accepts or rejects seeded edges, and the evidence it exists.\n- answer: The LLM-confirm step; the step-7 doc shows it ran on a real package and produced the confirmed graph.\n- verdict: correct",
-        "## Quiz — attempt 2\n### Q1 [UNK-002]\nVariant question about the confirm step.\n- answer: As you explained, the LLM-confirm step.\n- verdict: passed-after-reveal",
-    )
+    # Flip the retake's verdict — the file's LAST verdict line — to passed-after-reveal:
+    # UNK-002 becomes a revealed entry, and the merge go-ahead must then name it.
+    head, sep, _tail = GOLDEN.read_text(encoding="utf-8").rpartition("- verdict: correct")
+    assert sep
     p = tmp_path / GOLDEN.name
-    p.write_text(text, encoding="utf-8")
+    p.write_text(head + "- verdict: passed-after-reveal\n", encoding="utf-8")
     scenario = {"merge_markers": ["good to merge"]}
     ok, detail = G.quiz_gate_withheld([_ex(9, "All correct — good to merge.")], p, scenario)
     assert not ok and "UNK-002" in detail  # pass without naming the revealed entry
