@@ -51,6 +51,7 @@ MANAGED_FILES = (
     "references/plant.md",
     "references/quiz.md",
     "references/reference-hunt.md",
+    "unknowns-ledger-v1.schema.json",  # frontmatter contract (validator + future graders)
     "agents/openai.yaml",  # Codex invocation policy; inert on other platforms
 )
 

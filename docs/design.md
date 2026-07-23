@@ -720,6 +720,20 @@ SKILL.md/references rails and the two new eval cells above. The host repo's chan
 were reverted afterward per maintainer instruction — the round tested the skill, not
 the host.)*
 
+*(Execution note 3, 2026-07-23: step 3 — contract hardening — done.
+`unknowns-ledger-v1.schema.json` (frontmatter, additionalProperties: false) +
+`validator.py` (entry/quiz parsing, per-status field rules, header policing, cross-field
+corollaries; blueprint hardening: 1 MiB bounded read, no-alias YAML loader,
+Recursion/MemoryError guards, never-raise) + `find-unknowns validate` CLI + golden
+fixture (distilled from the round-1 ledger, augmented to cover every terminal status and
+a passed retake quiz) + in-progress fixture + ~30 mutation tests pinning error wording +
+CI smoke on both fixtures. Two contract pins were discovered by building the golden
+fixture and are now in ledger-contract.md/quiz.md/validator: (a) `technique` MAY also be
+absent on superseding corrections — a correction is not routed, which the round-3 field
+rule missed; (b) the recorded-warning format is a `- warning:` bullet directly under the
+quiz-section header, the one legal section-level bullet — round 1 improvised a format
+because none was specified.)*
+
 1. **Walking skeleton, no packaging:** author SKILL.md (thin: intake, dispatch rule,
    routing table + assumption procedure, gate conditions, rails, frontmatter as drafted) +
    the **8 load-bearing references** (blindspot-pass, interview, reference-hunt,

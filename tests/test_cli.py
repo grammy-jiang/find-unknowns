@@ -46,3 +46,17 @@ def test_unknown_target_exits_with_error(tmp_path: Path):
 def test_cli_marks_cover_outcomes():
     # Every installer outcome must render with a deliberate mark, never the "?" fallback.
     assert set(_OUTCOME_MARKS) == set(OUTCOMES)
+
+
+def test_validate_golden_exits_zero(capsys):
+    from conftest import GOLDEN
+
+    assert main(["validate", str(GOLDEN)]) == 0
+    assert "OK:" in capsys.readouterr().out
+
+
+def test_validate_invalid_exits_one(tmp_path: Path, capsys):
+    bad = tmp_path / "bad-feature-20260723.md"
+    bad.write_text("not a ledger\n", encoding="utf-8")
+    assert main(["validate", str(bad)]) == 1
+    assert "ERROR:" in capsys.readouterr().out

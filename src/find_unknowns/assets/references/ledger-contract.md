@@ -1,8 +1,10 @@
 # The unknowns ledger — full contract (`unknowns-ledger-v1`)
 
-This file is the authoritative source for the ledger format. In the walking skeleton the
-contract is enforced by discipline (the Read-back self-check below); a JSON schema and a
-deterministic validator arrive in a later milestone and must match this file exactly.
+This file is the authoritative source for the ledger format. It is enforced twice: in
+the live path by discipline (the Read-back self-check below), and statically by the
+packaged `unknowns-ledger-v1.schema.json` + `validator.py` (`find-unknowns validate
+<ledger.md>` — run in CI/evals, never in-session), which must match this file exactly
+(lockstep-edit rule).
 
 ## Location, naming, discovery
 
@@ -68,7 +70,7 @@ quiz_attempts: 0
 | `quadrant` | required; `known-unknown \| unknown-known \| assumption`; MUST be `assumption` on `deviated` entries |
 | `impact` | required; `architecture \| local \| cosmetic` |
 | `status` | required; `open \| investigating \| resolved \| deviated \| accepted-risk \| abandoned` |
-| `technique` | `interview \| reference-hunt \| brainstorm-prototype`; MUST be absent on `accepted-risk` and `deviated`; MAY be absent on `abandoned` and not-yet-routed `open` entries |
+| `technique` | `interview \| reference-hunt \| brainstorm-prototype`; MUST be absent on `accepted-risk` and `deviated`; MAY be absent on `abandoned`, not-yet-routed `open` entries, and superseding corrections (a correction is not routed) |
 | `statement` | required; the unknown/assumption in one sentence |
 | `resolution` | required on `resolved` and `deviated` (their quiz-judging basis) |
 | `risk` | required on `accepted-risk` (its quiz-judging basis) |

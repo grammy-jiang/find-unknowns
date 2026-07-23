@@ -5,9 +5,7 @@ Subcommands:
               (symlinks by default; --copy for real file copies)
     status    show what is installed where, and whether it matches this package
     remove    revert what setup did (alias: uninstall)
-
-A ``validate`` subcommand (checking a ledger against unknowns-ledger-v1) arrives with
-the deterministic validator in the contract-hardening milestone — see docs/design.md.
+    validate  check an unknowns ledger against the unknowns-ledger-v1 format
 """
 
 from __future__ import annotations
@@ -18,6 +16,7 @@ from pathlib import Path
 
 from . import __version__
 from .installer import PLATFORMS, detect_platforms, install, status, uninstall
+from .validator import validate_ledger
 
 _TARGET_CHOICES = [*PLATFORMS.keys(), "all"]
 
@@ -107,7 +106,18 @@ def main(argv: list[str] | None = None) -> int:
     p_un.add_argument("--root", type=Path, default=Path.cwd())
     p_un.add_argument("--dry-run", action="store_true")
 
+    p_val = sub.add_parser("validate", help="validate an unknowns-ledger-v1 file")
+    p_val.add_argument("ledger", type=Path, help="path to the ledger markdown file")
+
     args = parser.parse_args(argv)
+
+    if args.command == "validate":
+        errors = validate_ledger(args.ledger)
+        for e in errors:
+            print(f"ERROR: {e}")
+        if not errors:
+            print(f"OK: {args.ledger} is a valid unknowns-ledger-v1")
+        return 0 if not errors else 1
 
     try:
         home = Path.home()

@@ -15,7 +15,10 @@ faith defeats it, and that is an accepted property, not a bug.
 Quiz generation is **deferred while any `open` or `investigating` entry exists** — ask
 the user to triage each to `resolved`, `accepted-risk`, or `abandoned` first. The user
 may insist; then generate anyway, but record a warning in the quiz section naming the
-untriaged entries, and repeat it in conversation.
+untriaged entries, and repeat it in conversation. **Recorded-warning format (pinned):**
+every warning — insist-override, attempts-exhausted, fully-revealed — is a
+`- warning: <text>` bullet directly under the `## Quiz — attempt N` header; it is the
+only legal section-level bullet (question text and other prose are free).
 
 ## Pre-quiz confirmation pass
 

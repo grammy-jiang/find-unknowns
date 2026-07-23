@@ -52,6 +52,8 @@ jobs:
           uv run find-unknowns --version
           uv run find-unknowns setup all --dry-run --root "$RUNNER_TEMP"
           uv run find-unknowns status --root "$RUNNER_TEMP"
+          uv run find-unknowns validate evals/fixtures/c3-hearst-is-a-20260723.md
+          uv run find-unknowns validate evals/fixtures/schema-validator-20260723.md
 
   build:
     runs-on: ubuntu-latest
