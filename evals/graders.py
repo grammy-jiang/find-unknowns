@@ -156,13 +156,17 @@ def rail_read_before_write(transcript, ledger_path, scenario) -> tuple[bool, str
         is_ledger = "notes/unknowns/" in path
         if tool == "Read" and is_ledger:
             read_seen = True
-        elif tool in ("Write", "Edit") and is_ledger:
+        elif (
+            tool in ("Write", "Edit")
+            and is_ledger
             # The very first Write CREATES the ledger — nothing to re-read yet.
-            if not read_seen and any(
+            and not read_seen
+            and any(
                 t2 in ("Write", "Edit") and "notes/unknowns/" in p2
                 for _t, t2, p2 in events[: events.index((_turn, tool, path))]
-            ):
-                return (False, f"ledger {tool} at turn {_turn} with no prior ledger Read")
+            )
+        ):
+            return (False, f"ledger {tool} at turn {_turn} with no prior ledger Read")
     return (True, "reads precede rewrites")
 
 

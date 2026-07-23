@@ -333,10 +333,11 @@ def run_cell(scenario: dict, args, report_dir: Path) -> dict:
     run_started = _dt.datetime.now().timestamp()
 
     memory_load_failed = False
-    if scenario.get("memory_load_probe"):
-        if not _verify_memory_load(workdir, scenario, args.sim_model):
-            memory_load_failed = True
-            print(f"  [{cell}] HARNESS: CLAUDE.local.md did not reach the model — cell invalid")
+    if scenario.get("memory_load_probe") and not _verify_memory_load(
+        workdir, scenario, args.sim_model
+    ):
+        memory_load_failed = True
+        print(f"  [{cell}] HARNESS: CLAUDE.local.md did not reach the model — cell invalid")
 
     def _persist_transcript() -> None:
         (cell_dir / "transcript.json").write_text(
