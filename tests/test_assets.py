@@ -69,6 +69,15 @@ def test_all_asset_files_are_managed():
     )
 
 
+def test_example_session_embeds_golden_fixture():
+    # The walkthrough's embedded ledger IS the golden fixture, verbatim — drift between
+    # them would teach users a shape the validator rejects (blueprint discipline).
+    from conftest import GOLDEN
+
+    example = (ASSETS / "references" / "example-session.md").read_text(encoding="utf-8")
+    assert GOLDEN.read_text(encoding="utf-8") in example
+
+
 def test_skill_reference_links_resolve():
     # Every "— see references/<file>.md" pointer in SKILL.md must name a shipped file
     # (the design's link pattern is normative: an unreferenced bundled file never loads).

@@ -68,8 +68,8 @@ The load-bearing rules also live here because every phase depends on them:
    and this part of the codebase, what they already know they don't know, and where they
    are in their thinking. This calibrates everything that follows — the same feature needs
    a different diagnostic for a newcomer than for the module's author.
-2. Consult references/example-session.md if present (golden walkthrough; not yet authored
-   in the walking skeleton).
+2. Consult references/example-session.md before the session's first ledger write — a
+   complete lifecycle walkthrough ending in a known-valid ledger.
 3. **Blindspot pass** (— see references/blindspot-pass.md) populates the ledger with
    surfaced unknowns, each immediately classified as `known-unknown`, `unknown-known`, or
    `assumption`.
@@ -115,9 +115,9 @@ memory.
 
 Routing an entry sets `status: investigating` until its technique concludes. The
 blindspot pass is populating-only — never a route for an existing entry.
-`implementation-plan` (pre-gate; supplementary — it neither gates nor is gated) and
-`explainer-pitch` (post; optional deliverable) are deferred to a later milestone and not
-part of the walking skeleton.
+`implementation-plan` (pre-gate; supplementary — it neither gates nor is gated — see
+references/implementation-plan.md) and `explainer-pitch` (post; optional deliverable —
+see references/explainer-pitch.md) are phase-bound, not quadrant-routed.
 
 **Degradation rail:** if a routed reference file is absent (partial install), improvise
 the technique inline and add a `note:` bullet to the entry saying so — never silently

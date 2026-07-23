@@ -46,11 +46,15 @@ MANAGED_FILES = (
     "references/blindspot-pass.md",
     "references/brainstorm-prototype.md",
     "references/deviation-log.md",
+    "references/example-session.md",
+    "references/explainer-pitch.md",
+    "references/implementation-plan.md",
     "references/interview.md",
     "references/ledger-contract.md",
     "references/plant.md",
     "references/quiz.md",
     "references/reference-hunt.md",
+    "references/source.md",  # citation file; runtime-load exempt, still installed
     "unknowns-ledger-v1.schema.json",  # frontmatter contract (validator + future graders)
     "agents/openai.yaml",  # Codex invocation policy; inert on other platforms
 )
