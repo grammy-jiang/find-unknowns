@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling>=1.26"]  # floor for reproducible builds; the version source config below needs a modern hatchling
+build-backend = "hatchling.build"
+
+[project]
+name = "find-unknowns"
+description = "A lifecycle unknowns-ledger skill for coding agents (Claude Code, Codex, Copilot): blindspot pass, technique routing, deviation rail, and a pre-merge quiz — with a one-command installer."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [{ name = "Grammy Jiang" }]
+keywords = ["agent-skills", "claude-code", "codex", "copilot", "unknowns", "planning"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/grammy-jiang/find-unknowns"
+Issues = "https://github.com/grammy-jiang/find-unknowns/issues"
+
+[project.scripts]
+find-unknowns = "find_unknowns.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0", "pre-commit>=4.0"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+[tool.hatch.version]
+path = "src/find_unknowns/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/find_unknowns"]

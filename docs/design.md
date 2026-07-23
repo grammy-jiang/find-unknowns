@@ -683,6 +683,11 @@ plant sections are all descriptive, non-authoritative summaries of the shipped f
 
 ## Next Steps (dogfood-first order)
 
+*(Execution note, 2026-07-23: step 4 — packaging — was pulled forward ahead of steps 2–3
+by maintainer decision, prioritizing deliverability; pipx is the recommended install
+path. Dogfooding now happens against the packaged skill; the reviewed order below is
+otherwise unchanged.)*
+
 1. **Walking skeleton, no packaging:** author SKILL.md (thin: intake, dispatch rule,
    routing table + assumption procedure, gate conditions, rails, frontmatter as drafted) +
    the **8 load-bearing references** (blindspot-pass, interview, reference-hunt,

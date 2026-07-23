@@ -3,3 +3,18 @@ notes/
 
 # The plant's target file — per-machine, never committed (see docs/design.md, Platform scope)
 CLAUDE.local.md
+
+# Local dev installs of the product skill (canonical source is src/find_unknowns/assets/;
+# an installed copy committed here would silently drift — blueprint rule)
+.claude/skills/find-unknowns/
+.agents/
+.github/skills/
+
+# Python / packaging
+__pycache__/
+*.egg-info/
+dist/
+.venv/
+uv.lock
+.pytest_cache/
+.ruff_cache/
