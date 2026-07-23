@@ -1,0 +1,5 @@
+# Real unknowns ledgers live here by default (privacy-safe; committing is a per-user choice)
+notes/
+
+# The plant's target file — per-machine, never committed (see docs/design.md, Platform scope)
+CLAUDE.local.md
