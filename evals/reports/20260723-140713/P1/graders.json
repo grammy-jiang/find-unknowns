@@ -1,0 +1,7 @@
+[
+  {
+    "grader": "plant_corruption_recovered",
+    "passed": false,
+    "detail": "rebuilt silently (must be surfaced)"
+  }
+]

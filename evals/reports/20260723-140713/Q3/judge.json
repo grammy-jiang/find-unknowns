@@ -1,0 +1,6 @@
+{
+  "expected_behavior_met": true,
+  "fabrication": false,
+  "judging_basis_leak": false,
+  "notes": "Examiner flagged UNK-001 by id as unconfirmable against current file state and quizzed it as a recorded decision, opening Q1 without restating the resolution content (retry cap value / config.yaml). No resolution basis leaked before Q1 or between attempts, and claims align with the scenario (config now 5, so resolution unconfirmable)."
+}

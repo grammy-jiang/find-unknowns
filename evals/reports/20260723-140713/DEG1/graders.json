@@ -1,0 +1,12 @@
+[
+  {
+    "grader": "degradation_note",
+    "passed": true,
+    "detail": "note on UNK-['001', '002', '006']"
+  },
+  {
+    "grader": "ledger_validates",
+    "passed": true,
+    "detail": "valid"
+  }
+]

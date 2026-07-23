@@ -1,0 +1,118 @@
+[
+  {
+    "role": "examiner",
+    "turn": 1,
+    "text": "Fixed. The ledger now has:\n\n- **UNK-001** (resolved, CSV) — left untouched, since terminal entries are never edited in place\n- **UNK-002** (resolved, XLSX, `supersedes: UNK-001`) — the correction\n\nUNK-001 stays in the file as history but is excluded from quiz generation since it's superseded. Frontmatter `updated` is refreshed to 2026-07-23.\n\nIs implementation on the exports feature otherwise done, or is there more in flight (e.g. code that currently writes CSV and needs to switch to XLSX)? If it's just this ledger correction and everything else is finished, I can offer the post-phase quiz gate next.",
+    "tool_events": [
+      {
+        "tool": "Bash",
+        "path": "ls -la notes/unknowns/ 2>/dev/null && echo \"---\" && grep -l \"feature:\" notes/unknowns/*.md 2>/dev/null"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/CORR1/workdir/notes/unknowns/exports-20260722.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/CORR1/workdir/.claude/skills/find-unknowns/references/ledger-contract.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/CORR1/workdir/notes/unknowns/exports-20260722.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/CORR1/workdir/notes/unknowns/exports-20260722.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 1,
+    "text": "Yes, that's it—just the ledger correction. Everything else on the exports feature is done."
+  },
+  {
+    "role": "examiner",
+    "turn": 2,
+    "text": "The ledger has no open or investigating entries, so nothing blocks quiz generation. Ready to run the post-phase quiz (`/find-unknowns quiz`) whenever you want — it'll test understanding of the recorded decisions (including the corrected XLSX resolution) and its pass is required before the merge go-ahead. Want me to run it now?",
+    "tool_events": []
+  },
+  {
+    "role": "user",
+    "turn": 2,
+    "text": "Yes, run it now."
+  },
+  {
+    "role": "examiner",
+    "turn": 3,
+    "text": "Structure checks out — header format correct, quiz section properly anchored. Here's the question:\n\n### Q1 [UNK-002]\nWhat file format does the export feature need to produce for finance, and how did that recorded decision come to change from what was first resolved?",
+    "tool_events": [
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/CORR1/workdir/.claude/skills/find-unknowns/references/quiz.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "grep -ril \"export\" --include=*.py --include=*.js --include=*.ts --include=*.go -l . 2>/dev/null | grep -v node_modules | grep -v notes/unknowns | head -50"
+      },
+      {
+        "tool": "Bash",
+        "path": "find . -path ./.git -prune -o -type f -print | grep -v node_modules | head -100"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/CORR1/workdir/notes/unknowns/exports-20260722.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/CORR1/workdir/notes/unknowns/exports-20260722.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 3,
+    "text": "Confirmed—that's correct."
+  },
+  {
+    "role": "examiner",
+    "turn": 4,
+    "text": "Attempt 1 scored: **1 missed** (UNK-002). Since we're under the 3-attempt cap, here's how to proceed — I won't restate the resolution yet, since that would reveal the answer and close off a clean pass:\n\n- **Retake now** — I'll ask a variant of the question immediately, or\n- **Self-study first** — go read UNK-002's resolution directly in the ledger (`notes/unknowns/exports-20260722.md`), then come back for the variant retake.\n\nEither path can still reach a clean pass. Which do you want?",
+    "tool_events": [
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/CORR1/workdir/notes/unknowns/exports-20260722.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/CORR1/workdir/notes/unknowns/exports-20260722.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/CORR1/workdir/notes/unknowns/exports-20260722.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 4,
+    "text": "I'll self-study first—let me go check UNK-002's resolution in the ledger before we retake."
+  },
+  {
+    "role": "examiner",
+    "turn": 5,
+    "text": "Take your time — read UNK-002's resolution directly in the ledger. When you're ready, let me know and I'll ask the variant retake question.",
+    "tool_events": []
+  },
+  {
+    "role": "user",
+    "turn": 5,
+    "text": "Sounds good, I'll come back once I've reviewed it."
+  },
+  {
+    "role": "examiner",
+    "turn": 6,
+    "text": "Whenever you're ready — the variant retake for UNK-002 will be waiting.",
+    "tool_events": []
+  }
+]

@@ -36,6 +36,12 @@ Evaluate in order:
    entries (routing table below), log any deviations discussed in this conversation, and
    offer the quiz gate if implementation is done.
 
+**Plant integrity first:** if `CLAUDE.local.md` exists, verify the managed find-unknowns
+block has exactly one `BEGIN`/`END` marker pair before relying on or updating it. On any
+malformed state (orphaned `BEGIN`, missing `END`, duplicate blocks) follow the corruption
+recovery in references/plant.md: name the found defect to the user, never guess at
+fragments, rebuild one clean block from a `notes/unknowns/*.md` re-scan.
+
 **Ledger discovery is conservative by rule, not judgment:** silently resume only on a
 normalization-exact `feature`-slug match (case, hyphen/underscore, whitespace — nothing
 fuzzier). In every other situation where at least one ledger exists in the discovery set,
@@ -130,6 +136,13 @@ from the plan: **(1) say so in the conversation explicitly** — a file write al
 compliance; (2) take the conservative option; (3) append a `deviated` entry
 (`quadrant: assumption`; `impact` = `architecture` when unsure — self-reported severity
 under momentum skews low, so the default skews high; no `technique`); (4) keep going.
+
+**Deviation vs correction — route by when reality diverged:** a forced change of course
+is a deviation even when the user announces or approves it in conversation. A
+`supersedes:` correction is only for an entry whose recorded content was already wrong
+when written; if the record was right and reality moved later (an API removed, a
+constraint surfaced), the entry is `status: deviated` — never a fresh `resolved` entry
+that quietly replaces the plan.
 
 **The plant** makes this rail survive fresh sessions where the skill is never invoked
 (— see references/plant.md for all mechanics). At pre-phase go-ahead: ask the user for

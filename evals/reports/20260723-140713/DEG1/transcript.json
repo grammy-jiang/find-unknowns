@@ -1,0 +1,165 @@
+[
+  {
+    "role": "examiner",
+    "turn": 1,
+    "text": "No existing ledger, so we're starting fresh with the pre phase. Before that, two quick things:\n\n1. There's no `.gitignore` in the repo yet, and ledgers are meant to be private working notes — I'd like to add one with a `notes/` line before writing anything. OK to do that?\n\n2. **Intake** — to calibrate the blindspot pass to where you actually are:\n   - What's your experience with pagination trade-offs generally (offset/limit, cursor-based, keyset, etc.)?\n   - How familiar are you with this codebase's current list-endpoint patterns — is there prior art, or is this the first list endpoint?\n   - You mentioned you have opinions I'll need to ask you about — roughly what are they, or what's driving them (e.g., a strong preference for cursor pagination, a constraint from the frontend, a past incident)?\n   - Where are you in your thinking: leaning toward a specific style already, or genuinely torn?",
+    "tool_events": [
+      {
+        "tool": "Bash",
+        "path": "ls -la notes/unknowns/ 2>/dev/null || echo \"NO_DIR\""
+      },
+      {
+        "tool": "Bash",
+        "path": "cat .gitignore 2>/dev/null || echo \"NO_GITIGNORE\""
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 1,
+    "text": "Yes, go ahead and add the `.gitignore` with `notes/` in it.\n\nOn the intake:\n\n- Pagination trade-offs: I've dealt with offset/limit plenty and been burned by it — specifically pages shifting or duplicating/skipping rows when writes happen concurrently with a paginated read. I know keyset/cursor pagination avoids that because it anchors on the last-seen row's sort key instead of a numeric offset, but I haven't personally implemented a cursor scheme end-to-end, so I'm fuzzy on details like opaque cursor encoding, stable tie-breaking columns, and how to handle sort-key changes mid-pagination.\n- This codebase: I don't know of prior art here — as far as I know this would be the first list endpoint, so no existing convention to follow either way.\n- My opinion going in: cursor-based, specifically because of the concurrent-writes issue — offset pagination breaks (skips/dupes) when rows are inserted or deleted while a client is paging through. That's the failure mode I care about avoiding.\n- Where I'm at: leaning toward cursor, not torn — but I want the blindspot pass since I know my hands-on depth with cursor implementation specifically is thinner than my conviction about why offset is wrong."
+  },
+  {
+    "role": "examiner",
+    "turn": 2,
+    "text": "The ledger is created and passed the read-back check. Here's the blindspot pass — six unknowns surfaced, mostly from the fact that this repo has no code at all yet (so nothing to reference-hunt against) plus the three gaps you already named:\n\n| # | Statement | Class |\n|---|---|---|\n| UNK-001 | No datastore/framework/data model chosen yet — cursor feasibility depends on it | known-unknown |\n| UNK-002 | Fixed vs. client-arbitrary sort/filter — changes how generic the cursor scheme must be | known-unknown |\n| UNK-003 | Opaque cursor encoding scheme (your named gap) | known-unknown |\n| UNK-004 | Stable tie-breaking column (your named gap) | known-unknown |\n| UNK-005 | Assumption that cursor pagination fully avoids anomalies, including when the sort field's *value* itself mutates mid-pagination (your named gap) | assumption |\n| UNK-006 | Whether any consumer needs total-count / jump-to-page (keyset can't give this cheaply) | known-unknown |\n\nAll are architecture-impact except UNK-006 (local), so the pre-phase gate holds on all but one.\n\nRouting: UNK-001, UNK-002, UNK-006 need your answer directly → **interview** (note: the `interview.md` reference file is missing from this install, so I'm improvising that technique inline — I'll flag it in the ledger). UNK-003, UNK-004, UNK-005 are open design decisions nobody holds yet → **brainstorm-prototype**, so I'll lay out real options for you to react to rather than asking open-ended questions.\n\n**Interview questions first:**\n\n1. **UNK-001** — What's the actual stack/datastore for this? (Even roughly: Postgres/MySQL, Mongo, DynamoDB, Elasticsearch, something else — this changes whether keyset pagination is straightforward or awkward.)\n2. **UNK-002** — Will clients be able to choose sort field/direction per request, or is sort order fixed by the endpoint?\n3. **UNK-006** — Does any consumer (UI, another service) need a total count or \"jump to page N,\" or is infinite-scroll/next-only enough?\n\n**Brainstorm options to react to:**\n\n**UNK-003 (cursor encoding)** — three real directions:\n- **A. Base64-encoded JSON** of the last row's sort-key values (e.g. `{\"created_at\":\"...\",\"id\":\"...\"}`). Cheapest, human-inspectable if decoded, not tamper-proof (a client could hand-craft one, which is low-risk if the server still validates/re-queries but is worth being aware of).\n- **B. Signed/HMAC'd token** wrapping the same payload — same as A but tamper-evident; slightly more code, no external deps.\n- **C. Encrypted opaque token** (fully hides internal column names/values) — most defensive, most engineering overhead; usually overkill unless the sort keys are sensitive.\n\n**UNK-004 (tie-breaker)** — two real directions:\n- **A. Primary key as tie-breaker**, paired with whatever field you sort by (e.g. sort by `created_at`, break ties by `id`). Works as long as the sort field isn't already unique.\n- **B. No separate tie-breaker** — rely on the sort field alone being unique (e.g. an auto-increment id as the sort key itself). Simpler, but only valid if you're never sorting by something non-unique like `created_at` or `name`.\n\n**UNK-005 (sort-key mutation)** — two real directions:\n- **A. Restrict sortable fields to immutable ones** (e.g. `created_at`, `id`) so the anomaly can't occur by construction.\n- **B. Allow mutable sort fields** (e.g. `updated_at`, `status`) and accept that a row can still shift position mid-pagination — a real but narrower anomaly than offset's (a row can be seen twice or missed once, not whole pages shifting), documented as a known limitation.\n\nWhat are your calls on the three questions and three option sets?",
+    "tool_events": [
+      {
+        "tool": "Bash",
+        "path": "ls -la /workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/.claude/skills/find-unknowns/references/"
+      },
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/.gitignore"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/.claude/skills/find-unknowns/references/example-session.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/.claude/skills/find-unknowns/references/ledger-contract.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/.claude/skills/find-unknowns/references/blindspot-pass.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "echo \"=== root files ===\"; ls -la; echo \"=== package.json / requirements etc ===\"; find . -maxdepth 2 -iname \"package.json\" -o -iname \"requirements*.txt\" -o -iname \"pyproject.toml\" -o -iname \"go.mod\" -o -iname \"Gemfile\" -o -iname \"pom.xml\" -o -iname \"*.csproj\" 2>/dev/null | grep -v node_modules"
+      },
+      {
+        "tool": "Bash",
+        "path": "find . -mindepth 1 -not -path './.claude*' -not -path './.git*' | head -50"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/.claude/skills/find-unknowns/references/interview.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/.claude/skills/find-unknowns/references/brainstorm-prototype.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/.claude/skills/find-unknowns/references/reference-hunt.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/.claude/skills/find-unknowns/references/plant.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "mkdir -p notes/unknowns && ls notes/unknowns"
+      },
+      {
+        "tool": "Bash",
+        "path": "pwd; echo \"---\"; mkdir -p ./notes/unknowns && echo OK"
+      },
+      {
+        "tool": "Bash",
+        "path": "mkdir -p notes"
+      },
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/notes/unknowns/pagination-style-20260723.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/notes/unknowns/pagination-style-20260723.md"
+      },
+      {
+        "tool": "TaskCreate",
+        "path": ""
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 2,
+    "text": "Good, thanks for the gitignore. On the interview questions:\n\n1. **UNK-001 (stack)** — Postgres. That's what we're standardizing on for this service, so keyset pagination is straightforward — indexed `WHERE (sort_col, id) > (last_val, last_id)` type queries.\n2. **UNK-002 (sort)** — Fixed sort order for now, not client-arbitrary. It's the first list endpoint, no consumer has asked for custom sort yet, and a generic per-field cursor scheme is exactly the kind of complexity I don't want to take on speculatively. If a real need for arbitrary sort shows up later we can extend it then.\n3. **UNK-006 (total count)** — No, next-only/infinite-scroll is enough. I don't know of any consumer wanting jump-to-page, and keyset's whole value prop for us is avoiding the concurrent-write anomalies, not offering page N access.\n\nOn the brainstorm options:\n\n- **UNK-003 (encoding)** — Option A, base64-encoded JSON. No sensitive data in the sort keys, and I'd rather keep this simple for a first endpoint than add HMAC machinery I don't yet know I need. If we later find clients hand-crafting bad cursors to be an actual problem, we can upgrade to B then — but the server should already be validating/re-querying against real rows regardless, so a malformed cursor should just fail cleanly, not become a trust boundary.\n- **UNK-004 (tie-breaker)** — Option A, primary key paired with the sort field. I don't want to bet on any sort field being unique — that's a landmine waiting to happen — so pairing with `id` as the tie-breaker feels like the safe default even if it's a tiny bit more code.\n- **UNK-005 (sort-key mutation)** — Option A, restrict sortable fields to immutable ones (`created_at`, `id`). Given fixed sort order (UNK-002), this is basically free to enforce now, and it closes off the mutation anomaly by construction rather than documenting it as a known limitation. That feels like the right trade for a first implementation."
+  },
+  {
+    "role": "examiner",
+    "turn": 3,
+    "text": "All six entries are resolved, the read-back checks out, and the ledger closes clean. Pre-phase gate is released — every architecture-impact entry reached a terminal status.\n\n**You're clear to implement.** Summary of the pagination design as recorded:\n\n- **Style:** cursor (keyset) pagination on Postgres, fixed server-defined sort order\n- **Query shape:** indexed `WHERE (sort_col, id) > (last_val, last_id)` with `id` as an unconditional tie-breaker\n- **Sortable fields:** restricted to immutable columns (`created_at`, `id`) — closes the mutation anomaly by construction\n- **Cursor format:** base64-encoded JSON of the last row's sort-key values, unsigned — server re-validates against real rows, so a malformed cursor just fails cleanly\n- **Out of scope for now:** client-arbitrary sort/filter, total count, jump-to-page — explicitly deferred, not forgotten\n\nOne thing worth flagging on process, not content: the `interview.md` reference file is missing from this skill install (I improvised that technique and noted it on the three affected entries) — not a problem for your decisions, just something to know if you install/update this skill later.\n\nWant me to set up the **plant** — a small managed block in `CLAUDE.local.md` so that if implementation happens in a future session where this skill isn't explicitly invoked, any forced deviation from this plan still gets logged back to this ledger? It only writes after I verify `CLAUDE.local.md` itself is git-ignored.",
+    "tool_events": [
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/notes/unknowns/pagination-style-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/notes/unknowns/pagination-style-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/notes/unknowns/pagination-style-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/notes/unknowns/pagination-style-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/notes/unknowns/pagination-style-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/notes/unknowns/pagination-style-20260723.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/notes/unknowns/pagination-style-20260723.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 3,
+    "text": "Yes, set up the plant — that's exactly the kind of safety net worth having given implementation might happen in a later session. Go ahead once you've confirmed `CLAUDE.local.md` is git-ignored."
+  },
+  {
+    "role": "examiner",
+    "turn": 4,
+    "text": "The plant is set. Summary of where things stand:\n\n- **`.gitignore`** now covers `notes/` and `CLAUDE.local.md`\n- **Ledger** at `notes/unknowns/pagination-style-20260723.md` — all 6 entries resolved, pre-phase gate released\n- **Plant** written to `CLAUDE.local.md` — any future session (with or without this skill invoked) that forces a deviation from the pagination plan will log it back to this ledger\n\nYou're clear to implement cursor pagination on the new list endpoints per the design above. When implementation wraps up, run `/find-unknowns quiz` to close the loop before merging — it'll check your understanding of the recorded decisions (Postgres keyset query shape, cursor encoding, tie-breaker, immutable-sort-fields constraint) and gate the merge go-ahead on passing.",
+    "tool_events": [
+      {
+        "tool": "Bash",
+        "path": "cat .gitignore; echo \"---\"; ls -la CLAUDE.local.md 2>/dev/null || echo \"NO_CLAUDE_LOCAL_YET\""
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/.gitignore"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/.gitignore"
+      },
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/DEG1/workdir/CLAUDE.local.md"
+      }
+    ]
+  }
+]

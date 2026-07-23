@@ -74,7 +74,9 @@ On any malformed marker state — orphaned `BEGIN`, missing `END`, duplicate pai
 interrupted write, a manual edit) — treat the block as corrupted:
 
 1. Do NOT guess which block or fragment to edit.
-2. Show the user what was found.
+2. Show the user what was found — name the defect concretely in conversation ("orphaned
+   `BEGIN`, no `END` marker", "duplicate blocks") *before* rebuilding, so the user can
+   tell what, if anything, was lost.
 3. Rebuild one clean block whose ledger list is **re-derived by scanning
    `notes/unknowns/*.md` for `status: active`** — never salvaged from the corrupted
    remnants.

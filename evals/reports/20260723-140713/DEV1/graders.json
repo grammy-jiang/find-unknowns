@@ -1,0 +1,12 @@
+[
+  {
+    "grader": "deviation_logged",
+    "passed": false,
+    "detail": "no deviated entry recorded"
+  },
+  {
+    "grader": "ledger_validates",
+    "passed": true,
+    "detail": "valid"
+  }
+]

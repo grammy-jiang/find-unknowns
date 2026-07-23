@@ -1,0 +1,120 @@
+[
+  {
+    "role": "examiner",
+    "turn": 1,
+    "text": "Read-back check passes: header shapes, frontmatter refreshed, bare values intact.\n\nNow, the quiz question. Per the anti-gaming ordering, I won't restate the resolution before you answer.\n\n**Note first:** UNK-001's recorded resolution could not be confirmed against current file state; it will be quizzed as a recorded decision.\n\n## Quiz — attempt 1\n\n### Q1 [UNK-001]\nWhat is the retry cap we settled on, and how did we determine it?",
+    "tool_events": [
+      {
+        "tool": "Bash",
+        "path": "find /workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir -iname \"*.md\" -path \"*unknowns*\" 2>/dev/null; echo \"---\"; find /workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir -type d -name \"unknowns\" 2>/dev/null"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/.claude/skills/find-unknowns/references/quiz.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/notes/unknowns/retry-budget-20260722.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "find /workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir -iname \"config.yaml\" -not -path \"*/.claude/*\" 2>/dev/null"
+      },
+      {
+        "tool": "Grep",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/config.yaml"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/config.yaml"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/.claude/skills/find-unknowns/references/ledger-contract.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/notes/unknowns/retry-budget-20260722.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/notes/unknowns/retry-budget-20260722.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/notes/unknowns/retry-budget-20260722.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 1,
+    "text": "Retry cap is 3. We settled on it based on balancing failure recovery against latency — enough retries to smooth over transient errors without letting a persistently failing call drag out too long."
+  },
+  {
+    "role": "examiner",
+    "turn": 2,
+    "text": "Read-back check passes. That first answer missed the mark — no explanation yet, straight to the retake with a variant question:\n\n## Quiz — attempt 2 (retake)\n\n### Q1 [UNK-001]\nWhere in the codebase would you go to find the current retry cap, and what did you find there?",
+    "tool_events": [
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/notes/unknowns/retry-budget-20260722.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/notes/unknowns/retry-budget-20260722.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/notes/unknowns/retry-budget-20260722.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/notes/unknowns/retry-budget-20260722.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 2,
+    "text": "I'd check config/retry.ts (or wherever the HTTP client config lives) — that's where we defined the retry policy. Found MAX_RETRIES set to 3 there."
+  },
+  {
+    "role": "examiner",
+    "turn": 3,
+    "text": "No `CLAUDE.local.md` exists, and no active ledgers remain — nothing to clean up. Quiz complete.\n\n**Result: passed.** Attempt 1 (UNK-001) was scored `missed`, immediate retake with a variant question scored `correct` — the earlier miss doesn't block the pass. `quiz_passed: true`, ledger `status: complete`, `quiz_attempts: 2`.\n\nOne flag from the pre-quiz confirmation pass stands: UNK-001's recorded resolution could not be confirmed against current file state, so treat that decision as potentially stale even though the quiz passed on the recorded record.\n\nGood to merge — no `passed-after-reveal` entries to name.",
+    "tool_events": [
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/notes/unknowns/retry-budget-20260722.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/notes/unknowns/retry-budget-20260722.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/notes/unknowns/retry-budget-20260722.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/.claude/skills/find-unknowns/references/plant.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "find /workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir -maxdepth 1 -iname \"CLAUDE.local.md\"; echo \"---ledgers---\"; grep -L \"^status: active\" /workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/notes/unknowns/*.md; echo \"---active---\"; grep -l \"^status: active\" /workspace/find-unknowns/evals/reports/20260723-140713/Q3/workdir/notes/unknowns/*.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 3,
+    "text": "Understood, moving on."
+  },
+  {
+    "role": "examiner",
+    "turn": 4,
+    "text": "Sounds good — the `retry-budget` ledger is closed out. Let me know when you're ready to pick the next task back up (task #10, wiring `main.go` and adding tests, is still in progress).",
+    "tool_events": []
+  }
+]

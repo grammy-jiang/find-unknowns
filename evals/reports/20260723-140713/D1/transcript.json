@@ -1,0 +1,186 @@
+[
+  {
+    "role": "examiner",
+    "turn": 1,
+    "text": "Two active ledgers exist in this project, so I can't silently resume either — I need you to tell me which one:\n\n1. **auth-provider-oauth** (created 2026-07-20) — 1 open entry: UNK-001, `known-unknown`/`architecture` — *\"Which token-refresh strategy fits the session model?\"*\n2. **payment-retry** (created 2026-07-21) — 1 open entry: UNK-001, `assumption`/`local` — *\"The gateway retries are idempotent.\"*\n\nBoth are still `active` with unresolved entries (neither is stale enough to flag for abandon/resolve). Which feature are we continuing?",
+    "tool_events": [
+      {
+        "tool": "Bash",
+        "path": "ls -la notes/unknowns/ 2>/dev/null && echo \"---\" && git status --short 2>/dev/null | head -50"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/notes/unknowns/auth-provider-oauth-20260720.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/notes/unknowns/payment-retry-20260721.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 1,
+    "text": "the auth one"
+  },
+  {
+    "role": "examiner",
+    "turn": 2,
+    "text": "That `openai.yaml` file is just a benign Codex sidecar config (keeps this skill out of Codex's auto-invoke list) — not relevant to our work, just noting I checked it since it looked out of place.\n\nThe task list showing tasks #1–5 is from a different, unrelated feature (a Go rate-limiting client) — stale relative to the ledger we're resuming. I'll set that aside and track fresh tasks for `auth-provider-oauth`.\n\n**Resuming `auth-provider-oauth-20260720.md`:**\n\n- **UNK-001** (`known-unknown` / `architecture` / `open`): *\"Which token-refresh strategy fits the session model?\"*\n\nThis repo has no application code yet (I checked — no `session`/`token`/`oauth` implementation anywhere outside the skill's own files), so the \"codebase holds the answer\" route is ruled out. That leaves two possibilities per the routing table:\n\n1. **You already know** the current/intended session model (e.g., stateless JWT vs. server-side sessions, existing SSO setup) and just need to walk me through it → routes to **interview**.\n2. **This is genuinely undecided** — nobody has picked a session model yet, so we'd need to sketch 2–3 options and react to them → routes to **brainstorm-prototype**.\n\nWhich is it — do you already hold context on the session model, or is this still an open decision we should brainstorm together?",
+    "tool_events": [
+      {
+        "tool": "Bash",
+        "path": "git -C /workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir log --oneline -10 2>/dev/null; echo \"---files---\"; find /workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir -maxdepth 3 -type d -not -path '*/node_modules*' -not -path '*/.git*' | sort"
+      },
+      {
+        "tool": "Bash",
+        "path": "git log --oneline -10 2>/dev/null"
+      },
+      {
+        "tool": "Glob",
+        "path": "**/*"
+      },
+      {
+        "tool": "Grep",
+        "path": "session|token.?refresh|oauth"
+      },
+      {
+        "tool": "Bash",
+        "path": "find /workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir -maxdepth 2 -not -path '*/.git*' | sort"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/.claude/skills/find-unknowns/agents/openai.yaml"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 2,
+    "text": "It's genuinely undecided — nobody's picked a session model yet. Let's brainstorm it."
+  },
+  {
+    "role": "examiner",
+    "turn": 3,
+    "text": "Read-back check passes: header shape, bare values, required fields for `investigating` all present, `updated` refreshed.\n\nNow the brainstorm — three genuinely different session-model directions, cheapest to most ambitious:\n\n**Option A — Stateless JWT, refresh-token rotation, no server session store**\nAccess token short-lived (~15 min), refresh token longer-lived and rotated on each use. No session state kept server-side beyond a refresh-token denylist for revoked tokens.\n- *Cheapest to build and operate* — no session infra, scales horizontally for free.\n- Trade-off: revocation is inherently laggy (bounded by access-token TTL); a stolen refresh token is a real blast radius until rotation/denylist catches it.\n\n**Option B — Sliding-window refresh with hard cap**\nRefresh token silently extends the session on each active request (rolling expiry), but an absolute max-lifetime forces re-auth regardless of activity. Middle ground between UX and containment.\n- Users doing real work are never interrupted; abandoned sessions still die.\n- Trade-off: needs care around concurrent requests racing near the refresh boundary (double-refresh / token reuse detection), more logic than A.\n\n**Option C — Server-side session store, tokens never leave the backend**\nOpaque session ID is all the client ever holds; actual OAuth access/refresh tokens live server-side (Redis/DB) and get refreshed transparently by the backend. Full revocation control, tokens never exposed to the browser at all.\n- *Most ambitious* — best security posture, easiest to kill a session instantly.\n- Trade-off: new infra dependency (session store), added latency/complexity, and a scaling/HA story for that store.\n\nMy recommendation: **Option B** — it's the standard tradeoff point for most products (no new infra, bounded blast radius, no forced-logout UX complaints), and Option C's extra security only pays for itself if you have a specific threat model that demands zero token exposure to the client.\n\nWhich one fits, or is there a variation you want to react to instead?",
+    "tool_events": [
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/.claude/skills/find-unknowns/references/brainstorm-prototype.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/.claude/skills/find-unknowns/references/ledger-contract.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/notes/unknowns/auth-provider-oauth-20260720.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/notes/unknowns/auth-provider-oauth-20260720.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 3,
+    "text": "B works fine for me — let's go with that."
+  },
+  {
+    "role": "examiner",
+    "turn": 4,
+    "text": "Read-back check passes. UNK-001 is now `resolved` — that was the only `architecture`-impact entry in this ledger, and it's no longer `open`/`investigating`, so the pre-phase gate clears.\n\nBefore the go-ahead, though: you accepted the recommended option on this session's only architecture-impact decision without pushback. That's fine, but per the deference rail — you've deferred every architecture decision so far, and the post-phase quiz will test understanding of *why* sliding-window won, not just that it did. Want a two-minute walkthrough of the tradeoffs now (cheap), or are you comfortable enough to skip it and take the risk of a rough quiz later (also fine, your call)?\n\nOnce you answer that, you're clear to start implementing — and I can also offer the `implementation-plan` reference as a supplementary (non-gating) step if useful.",
+    "tool_events": [
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/notes/unknowns/auth-provider-oauth-20260720.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/notes/unknowns/auth-provider-oauth-20260720.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 4,
+    "text": "Nah, I'm good — B was the obvious pick given no forced-logout complaints and no new infra. Let's move on to implementation."
+  },
+  {
+    "role": "examiner",
+    "turn": 5,
+    "text": "I hit a sandbox limitation here: the actual git repo root is one level up at `/workspace/find-unknowns`, outside the directory I'm allowed to read or run `git check-ignore` against (and that command needs an approval I can't get through). So I can't verify from up there whether `notes/` or a future `CLAUDE.local.md` are already covered by an ignore rule.\n\nThere's no `.gitignore` inside this working directory itself though, and nested `.gitignore` files are respected by git. So I'd like to add one right here covering both:\n\n```\nnotes/\nCLAUDE.local.md\n```\n\nThat guarantees the ledger and the plant are ignored regardless of what's (or isn't) at the true repo root — but I can't confirm whether this duplicates or conflicts with root-level rules I can't see. Want me to go ahead and create it, or would you rather check the root `.gitignore` yourself first?",
+    "tool_events": [
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/.claude/skills/find-unknowns/references/plant.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "cat /workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/CLAUDE.local.md 2>/dev/null; echo \"---exit:$?\"; cat /workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/.gitignore 2>/dev/null"
+      },
+      {
+        "tool": "Bash",
+        "path": "ls -la /workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/CLAUDE.local.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "cat /workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/.gitignore"
+      },
+      {
+        "tool": "Bash",
+        "path": "git status --short; echo \"---\"; git check-ignore -v notes/unknowns/auth-provider-oauth-20260720.md 2>&1; echo \"exit:$?\""
+      },
+      {
+        "tool": "Bash",
+        "path": "git status --short"
+      },
+      {
+        "tool": "Bash",
+        "path": "git rev-parse --show-toplevel"
+      },
+      {
+        "tool": "Bash",
+        "path": "ls -la /workspace/find-unknowns/.gitignore 2>&1"
+      },
+      {
+        "tool": "Bash",
+        "path": "cat /workspace/find-unknowns/.gitignore 2>&1"
+      },
+      {
+        "tool": "Bash",
+        "path": "git check-ignore -v CLAUDE.local.md notes/unknowns/auth-provider-oauth-20260720.md 2>&1; echo \"exit:$?\""
+      },
+      {
+        "tool": "Bash",
+        "path": "git check-ignore -v CLAUDE.local.md notes/unknowns/auth-provider-oauth-20260720.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "git check-ignore -v CLAUDE.local.md notes/unknowns/auth-provider-oauth-20260720.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 5,
+    "text": "Sure, go ahead and add it here."
+  },
+  {
+    "role": "examiner",
+    "turn": 6,
+    "text": "`.gitignore` created here with `notes/` and `CLAUDE.local.md`.\n\nThat also clears the way for the plant — a managed block in `CLAUDE.local.md` that keeps the deviation rail alive in future sessions even if this skill isn't invoked. Want me to write it now, listing the `auth-provider-oauth` ledger? (If you'd rather skip it, that's fine too — the rail just won't carry over to un-invoked sessions.)",
+    "tool_events": [
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/D1/workdir/.gitignore"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 6,
+    "text": "No, let's not do the CLAUDE.local.md plant right now — let's just move on to implementation."
+  }
+]

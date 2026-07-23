@@ -1,0 +1,19 @@
+[
+  {
+    "cell": "DEV2",
+    "name": "seeded-contradiction-skill-invoked",
+    "passed": true,
+    "harness_leak": false,
+    "memory_load_failed": false,
+    "judge_basis_leak": false,
+    "graders": {
+      "deviation_logged": true,
+      "evidence_of_encounter": true,
+      "ledger_validates": true
+    },
+    "judge_expected_behavior_met": true,
+    "turns": 8,
+    "ledger": "greeting-20260722.md",
+    "egress_damping": "skipped-managed-proxy"
+  }
+]

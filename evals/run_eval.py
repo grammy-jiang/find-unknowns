@@ -14,8 +14,11 @@ names (docs/design.md, eval plan):
    is a HARNESS defect (reported like a leak), never a skill failure.
 4. **Per-cell tool grant + egress damping** — ``allowed_tools`` overrides the examiner
    grant (default mirrors SKILL.md's surface plus Skill); a grant containing Bash gets
-   proxy env vars pointed at an unroutable address (best-effort egress damping, honestly
-   NOT a firewall — the environment's own sandbox is the real boundary).
+   proxy env vars pointed at an unroutable address, with the model API hosts carved out
+   via NO_PROXY (best-effort egress damping, honestly NOT a firewall — the environment's
+   own sandbox is the real boundary). In managed-proxy environments, where the examiner's
+   own API calls must ride the configured proxy, damping is skipped and the skip is
+   recorded in the cell's summary record (``egress_damping``).
 
 Roles stay separated: examiner (generator), simulator (environment), graders
 (computational sensors), judge (inferential sensor). The examiner never grades itself.
@@ -171,20 +174,35 @@ def _parse_stream_json(stdout: str) -> tuple[str | None, str, bool, list[dict]]:
     return session_id, result_text, is_error, tool_events
 
 
+def _damping_mode(allowed_tools: str) -> str:
+    """Which egress-damping mode a cell's grant gets. In a managed-egress environment
+    (parent HTTPS_PROXY set) ALL outbound traffic — including the examiner's own model
+    API calls — must ride the configured proxy, so the dead-proxy trick would kill the
+    cell itself, not just its Bash grant. There we skip damping (recorded, never silent)
+    and the environment's sandbox stays the real boundary."""
+    if "Bash" not in allowed_tools:
+        return "n/a"
+    if os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy"):
+        return "skipped-managed-proxy"
+    return "dead-proxy"
+
+
 def _sandbox_env(allowed_tools: str) -> dict:
     """Capability #4's damping half: a Bash-widened examiner gets its egress pointed at an
-    unroutable proxy. Best-effort, honestly not a firewall; the env's sandbox is the real
+    unroutable proxy, with the model API host carved out so the examiner itself stays
+    reachable. Best-effort, honestly not a firewall; the env's sandbox is the real
     boundary, and the report records the widened grant as a measured change."""
-    if "Bash" not in allowed_tools:
+    if _damping_mode(allowed_tools) != "dead-proxy":
         return {}
     dead = "http://127.0.0.1:9"
+    keep = "api.anthropic.com,claude.ai,console.anthropic.com"
     return {
         "HTTP_PROXY": dead,
         "HTTPS_PROXY": dead,
         "http_proxy": dead,
         "https_proxy": dead,
-        "NO_PROXY": "",
-        "no_proxy": "",
+        "NO_PROXY": keep,
+        "no_proxy": keep,
     }
 
 
@@ -326,6 +344,9 @@ def run_cell(scenario: dict, args, report_dir: Path) -> dict:
     scenario["_workdir"] = str(workdir)  # for graders that inspect non-ledger sandbox state
 
     allowed_tools = scenario.get("allowed_tools", DEFAULT_ALLOWED_TOOLS)
+    damping = _damping_mode(allowed_tools)
+    if damping == "skipped-managed-proxy":
+        print(f"  [{cell}] NOTE: egress damping skipped (managed-proxy env); Bash runs undamped")
     transcript: list[dict] = []
     session_id: str | None = None
     prompt = scenario["invocation"].strip()
@@ -437,7 +458,7 @@ def run_cell(scenario: dict, args, report_dir: Path) -> dict:
     if ledger_path:
         shutil.copy2(ledger_path, cell_dir / "ledger.md")
 
-    return {
+    record = {
         "cell": cell,
         "name": scenario["name"],
         "passed": passed,
@@ -449,6 +470,9 @@ def run_cell(scenario: dict, args, report_dir: Path) -> dict:
         "turns": len([m for m in transcript if m["role"] == "examiner"]),
         "ledger": str(ledger_path.name) if ledger_path else None,
     }
+    if damping != "n/a":
+        record["egress_damping"] = damping  # no silent caps: a widened grant is measured
+    return record
 
 
 def main() -> int:

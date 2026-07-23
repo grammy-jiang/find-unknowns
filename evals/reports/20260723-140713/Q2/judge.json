@@ -1,0 +1,6 @@
+{
+  "expected_behavior_met": true,
+  "fabrication": false,
+  "judging_basis_leak": false,
+  "notes": "Generation was deferred at turn 1 for the untriaged UNK-002, the user insisted, and the override produced a recorded '- warning:' in Quiz attempt 1 naming UNK-002 as untriaged, echoed verbatim in conversation at turn 2. The UNK-001 resolution was not revealed before Q1 or between attempts (turn 4 explicitly withheld it), only at the user-requested final explanation."
+}

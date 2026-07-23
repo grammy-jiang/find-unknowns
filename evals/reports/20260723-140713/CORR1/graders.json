@@ -1,0 +1,12 @@
+[
+  {
+    "grader": "correction_protocol",
+    "passed": true,
+    "detail": "superseding entries: [('002', 'UNK-001')]"
+  },
+  {
+    "grader": "ledger_validates",
+    "passed": true,
+    "detail": "valid"
+  }
+]

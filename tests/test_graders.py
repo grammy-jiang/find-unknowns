@@ -109,6 +109,41 @@ def test_quiz_gate_disclosure_names_revealed_entries(tmp_path):
     assert ok
 
 
+def test_evidence_of_encounter_accepts_bash_view():
+    # A Bash-widened examiner views territory with cat/git, not the Read tool (live DEV2).
+    scenario = {"encounter_file": "src/app.py"}
+    bash_first = [
+        _ex(1, "", [{"tool": "Bash", "path": "test -f x; cat src/app.py"}]),
+        _ex(2, "", [{"tool": "Edit", "path": "notes/unknowns/g-20260722.md"}]),
+    ]
+    assert G.evidence_of_encounter(bash_first, None, scenario)[0]
+    never = [_ex(1, "", [{"tool": "Edit", "path": "notes/unknowns/g-20260722.md"}])]
+    ok, detail = G.evidence_of_encounter(never, None, scenario)
+    assert not ok and "never encountered" in detail
+    late = [
+        _ex(1, "", [{"tool": "Edit", "path": "notes/unknowns/g-20260722.md"}]),
+        _ex(2, "", [{"tool": "Bash", "path": "cat src/app.py"}]),
+    ]
+    ok, detail = G.evidence_of_encounter(late, None, scenario)
+    assert not ok and "before" in detail
+
+
+def test_plant_corruption_surfacing_accepts_named_defect(tmp_path):
+    (tmp_path / "CLAUDE.local.md").write_text(
+        "<!-- find-unknowns:BEGIN schema=unknowns-ledger-v1 -->\nbody\n"
+        "<!-- find-unknowns:END -->\n",
+        encoding="utf-8",
+    )
+    scenario = {"_workdir": str(tmp_path)}
+    silent = [_ex(1, "Rebuilt. CLAUDE.local.md now has one clean block.")]
+    ok, detail = G.plant_corruption_recovered(silent, None, scenario)
+    assert not ok and "silently" in detail
+    named = [_ex(1, "The plant block is orphaned: a BEGIN with no END marker. Rebuilding.")]
+    assert G.plant_corruption_recovered(named, None, scenario)[0]
+    concrete = [_ex(1, "Found a `BEGIN` marker with a missing `END`; I will not guess.")]
+    assert G.plant_corruption_recovered(concrete, None, scenario)[0]
+
+
 def test_ledger_home_offer_must_precede_first_write():
     events = [{"tool": "Write", "path": "notes/unknowns/x-20260723.md"}]
     late = [

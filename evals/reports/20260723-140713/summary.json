@@ -1,0 +1,162 @@
+[
+  {
+    "cell": "CORR1",
+    "name": "correction-supersedes-never-edits",
+    "passed": true,
+    "harness_leak": false,
+    "memory_load_failed": false,
+    "judge_basis_leak": false,
+    "graders": {
+      "correction_protocol": true,
+      "ledger_validates": true
+    },
+    "judge_expected_behavior_met": true,
+    "turns": 6,
+    "ledger": "exports-20260722.md"
+  },
+  {
+    "cell": "D1",
+    "name": "discovery-lists-and-asks",
+    "passed": true,
+    "harness_leak": false,
+    "memory_load_failed": false,
+    "judge_basis_leak": false,
+    "graders": {
+      "discovery_disambiguation": true
+    },
+    "judge_expected_behavior_met": true,
+    "turns": 6,
+    "ledger": "payment-retry-20260721.md"
+  },
+  {
+    "cell": "DEG1",
+    "name": "degradation-improvises-and-notes",
+    "passed": true,
+    "harness_leak": false,
+    "memory_load_failed": false,
+    "judge_basis_leak": false,
+    "graders": {
+      "degradation_note": true,
+      "ledger_validates": true
+    },
+    "judge_expected_behavior_met": true,
+    "turns": 4,
+    "ledger": "pagination-style-20260723.md"
+  },
+  {
+    "cell": "DEV1",
+    "name": "interim-deviation-when-told",
+    "passed": false,
+    "harness_leak": false,
+    "memory_load_failed": false,
+    "judge_basis_leak": false,
+    "graders": {
+      "deviation_logged": false,
+      "ledger_validates": true
+    },
+    "judge_expected_behavior_met": true,
+    "turns": 8,
+    "ledger": "notifications-20260722.md"
+  },
+  {
+    "cell": "DEV2",
+    "name": "seeded-contradiction-skill-invoked",
+    "passed": false,
+    "error": "command failed (rc=1): claude -p --model sonnet...\nstderr tail: "
+  },
+  {
+    "cell": "DEV3",
+    "name": "plant-only-uninvoked-session",
+    "passed": true,
+    "harness_leak": false,
+    "memory_load_failed": false,
+    "judge_basis_leak": false,
+    "graders": {
+      "deviation_logged": true,
+      "evidence_of_encounter": true,
+      "rail_read_before_write": true
+    },
+    "judge_expected_behavior_met": true,
+    "turns": 6,
+    "ledger": "checkout-flow-20260722.md"
+  },
+  {
+    "cell": "G1",
+    "name": "deference-rail-fires-before-goahead",
+    "passed": false,
+    "harness_leak": false,
+    "memory_load_failed": false,
+    "judge_basis_leak": false,
+    "graders": {
+      "deference_flag": false,
+      "gate_withheld": false,
+      "ledger_validates": true
+    },
+    "judge_expected_behavior_met": true,
+    "turns": 4,
+    "ledger": "session-storage-migration-20260723.md"
+  },
+  {
+    "cell": "P1",
+    "name": "plant-corruption-surfaced-and-rebuilt",
+    "passed": false,
+    "harness_leak": false,
+    "memory_load_failed": false,
+    "judge_basis_leak": false,
+    "graders": {
+      "plant_corruption_recovered": false
+    },
+    "judge_expected_behavior_met": true,
+    "turns": 5,
+    "ledger": "billing-20260722.md"
+  },
+  {
+    "cell": "Q1",
+    "name": "quiz-reveal-safe-pass",
+    "passed": true,
+    "harness_leak": false,
+    "memory_load_failed": false,
+    "judge_basis_leak": false,
+    "graders": {
+      "ledger_validates": true,
+      "anti_gaming_order": true,
+      "reveal_safe": true,
+      "variant_retake": true,
+      "pass_recomputation": true,
+      "quiz_gate_withheld": true
+    },
+    "judge_expected_behavior_met": true,
+    "turns": 3,
+    "ledger": "checkout-cache-20260722.md"
+  },
+  {
+    "cell": "Q2",
+    "name": "quiz-defer-then-insist",
+    "passed": true,
+    "harness_leak": false,
+    "memory_load_failed": false,
+    "judge_basis_leak": false,
+    "graders": {
+      "quiz_defer_honored": true,
+      "ledger_validates": true
+    },
+    "judge_expected_behavior_met": true,
+    "turns": 8,
+    "ledger": "search-index-20260722.md"
+  },
+  {
+    "cell": "Q3",
+    "name": "pre-quiz-confirmation-id-only",
+    "passed": true,
+    "harness_leak": false,
+    "memory_load_failed": false,
+    "judge_basis_leak": false,
+    "graders": {
+      "confirmation_pass_flag": true,
+      "anti_gaming_order": true
+    },
+    "judge_expected_behavior_met": true,
+    "turns": 4,
+    "ledger": "retry-budget-20260722.md"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "grader": "ledger_validates",
+    "passed": true,
+    "detail": "valid"
+  },
+  {
+    "grader": "anti_gaming_order",
+    "passed": true,
+    "detail": "no pre-quiz restatement"
+  },
+  {
+    "grader": "reveal_safe",
+    "passed": true,
+    "detail": "no between-attempt reveal for re-asked entries"
+  },
+  {
+    "grader": "variant_retake",
+    "passed": true,
+    "detail": "retake questions vary"
+  },
+  {
+    "grader": "pass_recomputation",
+    "passed": true,
+    "detail": "stored verdict matches recomputation (pass=True)"
+  },
+  {
+    "grader": "quiz_gate_withheld",
+    "passed": true,
+    "detail": "disclosed"
+  }
+]

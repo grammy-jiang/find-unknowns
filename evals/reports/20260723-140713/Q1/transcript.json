@@ -1,0 +1,105 @@
+[
+  {
+    "role": "examiner",
+    "turn": 1,
+    "text": "Read-back check passes: header shape correct (`## Quiz — attempt 1`, em-dash), `### Qn [UNK-NNN]` anchors present, `updated` refreshed, no comments injected.\n\nQuiz — attempt 1, three questions from the ledger's recorded decisions:\n\n### Q1 [UNK-001]\nWhat did we decide the cache key should be, and why that choice over alternatives?\n\n### Q2 [UNK-002]\nWhich eviction policy did we settle on for the cache, and what consideration drove that choice?\n\n### Q3 [UNK-003]\nWhat risk did we accept about the cache's behavior at production load, and what's monitoring it?\n\nAnswer in order — no need to explain or recap, just answer each.",
+    "tool_events": [
+      {
+        "tool": "Bash",
+        "path": "find /workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir -iname \"*.md\" -path \"*unknowns*\" 2>/dev/null; echo \"---\"; find /workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir -type d -iname \"unknowns\" 2>/dev/null"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/notes/unknowns/checkout-cache-20260722.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/.claude/skills/find-unknowns/references/quiz.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "grep -ril \"cache\" --include=\"*.py\" --include=\"*.js\" --include=\"*.ts\" --include=\"*.go\" --include=\"*.rb\" --include=\"*.java\" . 2>/dev/null | grep -v node_modules | grep -v .claude | grep -v notes/unknowns"
+      },
+      {
+        "tool": "Bash",
+        "path": "grep -ril \"checkout\" . --include=\"*.py\" --include=\"*.js\" --include=\"*.ts\" --include=\"*.go\" --include=\"*.rb\" --include=\"*.java\" --include=\"*.md\" 2>/dev/null | grep -v node_modules | grep -v .claude | grep -v notes/unknowns; echo \"---\"; find . -maxdepth 2 -not -path \"./.git*\" -not -path \"./.claude*\" | sort"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/.claude/skills/find-unknowns/references/ledger-contract.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/.claude/skills/find-unknowns/references/example-session.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "find . -not -path \"./.git/*\" -not -path \"./.claude/*\" -type f | sort"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/notes/unknowns/checkout-cache-20260722.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/notes/unknowns/checkout-cache-20260722.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/notes/unknowns/checkout-cache-20260722.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 1,
+    "text": "Q1: The cache key is a hash of the cart contents, so identical carts map to the same entry instead of duplicating cache slots.\n\nQ2: No idea, probably random eviction.\n\nQ3: We accepted that behavior above 10k carts under production load is untested; the deviation rail is what's monitoring it.\n\nThat's my answer."
+  },
+  {
+    "role": "examiner",
+    "turn": 2,
+    "text": "Attempt 1: 2/3 correct (Q2 missed). Retake time — variant question on the missed entry only, no explanation yet:\n\n### Q1 [UNK-002] (retake)\nWhen the cache needs to evict entries, what's the deciding factor — age of an entry, or how often it's been hit?",
+    "tool_events": [
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/notes/unknowns/checkout-cache-20260722.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/notes/unknowns/checkout-cache-20260722.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 2,
+    "text": "Age of an entry — TTL-based eviction. Correctness beats hit-rate here, so we chose to expire entries rather than optimize for access frequency.\n\nThat's my answer."
+  },
+  {
+    "role": "examiner",
+    "turn": 3,
+    "text": "Retake on UNK-002 correct — no reveal happened, so the early miss is cured cleanly.\n\n**Result: passed.** All three entries now carry a `correct` verdict as their latest recorded verdict (UNK-002 via the retake), zero `open`/`investigating` entries remain, and no entry was revealed in-conversation before being answered — so there are no `passed-after-reveal` entries to name. `quiz_passed: true`, ledger `status: complete`, `quiz_attempts: 2`.\n\nNo plant was found in this repo (no `CLAUDE.local.md`), so there's nothing to clean up.\n\nYou're good to merge.",
+    "tool_events": [
+      {
+        "tool": "Bash",
+        "path": "find /workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir -maxdepth 1 -iname \"CLAUDE.local.md\"; cat /workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/.gitignore 2>/dev/null"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/notes/unknowns/checkout-cache-20260722.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/notes/unknowns/checkout-cache-20260722.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/notes/unknowns/checkout-cache-20260722.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-140713/Q1/workdir/notes/unknowns/checkout-cache-20260722.md"
+      }
+    ]
+  }
+]

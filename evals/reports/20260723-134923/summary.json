@@ -1,0 +1,21 @@
+[
+  {
+    "cell": "C1",
+    "name": "classify-route-and-establish-home",
+    "passed": true,
+    "harness_leak": false,
+    "memory_load_failed": false,
+    "judge_basis_leak": false,
+    "graders": {
+      "ledger_written": true,
+      "ledger_validates": true,
+      "classification_expected": true,
+      "rail_read_before_write": true,
+      "grounding_search_first": true,
+      "ledger_home_offer": true
+    },
+    "judge_expected_behavior_met": true,
+    "turns": 10,
+    "ledger": "api-client-rate-limiting-20260723.md"
+  }
+]

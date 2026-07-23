@@ -1,0 +1,12 @@
+[
+  {
+    "grader": "confirmation_pass_flag",
+    "passed": true,
+    "detail": "flagged by id with generic caveat"
+  },
+  {
+    "grader": "anti_gaming_order",
+    "passed": true,
+    "detail": "no pre-quiz restatement"
+  }
+]

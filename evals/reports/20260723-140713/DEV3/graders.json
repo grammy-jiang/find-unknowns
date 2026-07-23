@@ -1,0 +1,17 @@
+[
+  {
+    "grader": "deviation_logged",
+    "passed": true,
+    "detail": "surfaced + recorded"
+  },
+  {
+    "grader": "evidence_of_encounter",
+    "passed": true,
+    "detail": "encounter precedes the deviation record"
+  },
+  {
+    "grader": "rail_read_before_write",
+    "passed": true,
+    "detail": "reads precede rewrites"
+  }
+]

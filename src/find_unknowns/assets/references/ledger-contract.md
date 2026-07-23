@@ -91,6 +91,11 @@ quiz_attempts: 0
 
 ### Correction protocol (active ledgers only)
 
+A correction records that an entry was **wrong when written**. If the record was right
+and reality moved later (an API removed, a constraint surfaced), that is a deviation —
+`status: deviated`, even when the user announces the change — not a correction; see
+references/deviation-log.md, "Deviation vs correction".
+
 Terminal entries (`resolved` / `deviated` / `accepted-risk` / `abandoned`) are never
 edited in place. To reverse one, append a new entry carrying `supersedes: UNK-NNN`,
 shaped as the copy-template pattern populated with the fields its own target status

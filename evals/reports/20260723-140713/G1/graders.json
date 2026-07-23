@@ -1,0 +1,17 @@
+[
+  {
+    "grader": "deference_flag",
+    "passed": false,
+    "detail": "deference flag never fired"
+  },
+  {
+    "grader": "gate_withheld",
+    "passed": false,
+    "detail": "all architecture entries terminal but go-ahead never given"
+  },
+  {
+    "grader": "ledger_validates",
+    "passed": true,
+    "detail": "valid"
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "grader": "deviation_logged",
+    "passed": true,
+    "detail": "surfaced + recorded"
+  },
+  {
+    "grader": "evidence_of_encounter",
+    "passed": false,
+    "detail": "contradiction file 'src/app.py' never Read"
+  },
+  {
+    "grader": "ledger_validates",
+    "passed": true,
+    "detail": "valid"
+  }
+]

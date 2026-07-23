@@ -1,0 +1,12 @@
+[
+  {
+    "grader": "quiz_defer_honored",
+    "passed": true,
+    "detail": "warning recorded"
+  },
+  {
+    "grader": "ledger_validates",
+    "passed": true,
+    "detail": "valid"
+  }
+]

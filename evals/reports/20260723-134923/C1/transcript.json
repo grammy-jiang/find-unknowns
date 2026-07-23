@@ -1,0 +1,481 @@
+[
+  {
+    "role": "examiner",
+    "turn": 1,
+    "text": "This is a fresh repo — no code beyond the skill's own files, no `notes/` directory yet, and no ledger exists for this feature. That puts us in the **pre phase**.\n\nBefore I start surfacing unknowns, I want to calibrate to where you actually are, since the same feature needs a different approach for a newcomer than for someone who half-remembers the code:\n\n1. **This codebase**: I don't see any project files here yet besides the skill itself — is the actual API client code somewhere else (a different path/repo I should be pointed at), or is this genuinely a from-scratch situation where the API client doesn't exist yet either?\n2. **Rate limiting itself**: how comfortable are you with the concept generally — e.g. do terms like token bucket, sliding window, or leaky bucket mean something to you, or is this new territory too?\n3. **What you already suspect**: you said you're not sure what exists — do you have *any* hunch, even a vague one (e.g. \"I think there might be retry logic already,\" or \"I recall someone mentioning a config for this\")?\n4. **Where you are in your thinking**: is this \"I need to figure out if rate limiting exists before I touch anything,\" or have you already decided to add it and just need to know how it'll interact with what's there?",
+    "tool_events": [
+      {
+        "tool": "Bash",
+        "path": "ls -la notes/unknowns/ 2>/dev/null && echo \"---\" && find . -iname \"*rate*limit*\" -not -path \"*/node_modules/*\" -not -path \"*/.git/*\" 2>/dev/null"
+      },
+      {
+        "tool": "Bash",
+        "path": "echo \"=== repo root check ===\"; git rev-parse --show-toplevel 2>&1; echo \"=== notes dir ===\"; ls -la notes 2>&1; echo \"=== unknowns dir ===\"; ls -la notes/unknowns 2>&1; echo \"=== gitignore ===\"; cat .gitignore 2>&1"
+      },
+      {
+        "tool": "Bash",
+        "path": "pwd; echo \"---\"; git -C /workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir rev-parse --show-toplevel; echo \"---\"; git -C /workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir status"
+      },
+      {
+        "tool": "Bash",
+        "path": "pwd"
+      },
+      {
+        "tool": "Bash",
+        "path": "git rev-parse --show-toplevel && git status --short"
+      },
+      {
+        "tool": "Bash",
+        "path": "ls -la"
+      },
+      {
+        "tool": "Bash",
+        "path": "find . -type f -not -path \"./.claude/*\" | head -50; echo \"---.claude contents---\"; find .claude -maxdepth 3 -type d"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 1,
+    "text": "Alright — a few things:\n\n1. **Codebase**: this is genuinely from-scratch. No API client exists yet — I haven't written it.\n2. **Rate limiting concepts**: I know the terms — token bucket, sliding window, leaky bucket — I've implemented basic versions before. Not new territory.\n3. **Hunch**: no real hunch. I haven't looked, so I honestly don't know if there's any limiter code lurking anywhere in this repo.\n4. **Where I am**: I've already decided — per-endpoint limits, that's a product call I'm making now. What I need is to figure out what's already there before I start writing, and I've been assuming the client is single-threaded this whole time without ever actually verifying that."
+  },
+  {
+    "role": "examiner",
+    "turn": 2,
+    "text": "I did two things before writing anything down: added a `.gitignore` with `notes/` (this repo had none — ledgers are private working notes, so I'm establishing that convention now), and confirmed by actual search — not memory — that this repo has zero source files, manifests, or prior rate-limiting code anywhere. That grounds what follows.\n\n**Blindspot pass** — six things surfaced, all architecture-impact (this is early enough that most decisions here would force a redesign if gotten wrong later):\n\n- **UNK-001** — no language/runtime/HTTP stack is chosen anywhere in the repo. *(known-unknown)*\n- **UNK-002** — \"rate limiting\" is ambiguous: self-throttling outbound calls to stay under a budget, vs. handling the server telling you to back off (429/Retry-After), vs. both. You didn't name which. *(known-unknown)*\n- **UNK-003** — which external API this even talks to, and whether its real published limits (numbers, burst vs. sustained) are known, is unstated. *(known-unknown)*\n- **UNK-004** — \"per-endpoint\" is underspecified: literal URL, or route template? Matters for paths like `/users/{id}` — literal-URL keying leaks memory as a limiter map grows unbounded. *(known-unknown)*\n- **UNK-005** — the single-threaded assumption you flagged yourself. Recorded as an `assumption` per your own framing. *(assumption)*\n- **UNK-006** — nobody's decided what happens when a call would exceed the limit: block-and-wait, reject-immediately, or queue-with-timeout. *(known-unknown, open decision)*\n\nLedger written to `notes/unknowns/api-client-rate-limiting-20260723.md`. Routing: 001–005 go to you (interview) since you hold the answers; 006 is genuinely undecided, so I'll run a quick brainstorm-prototype (options with trade-offs) once the interview settles the rest.\n\nFirst question, since it defines the scope of everything else — **UNK-002**: is \"rate limiting\" here about your client proactively staying under a self-imposed budget, about correctly handling 429s the server sends you, or both?",
+    "tool_events": [
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/.claude/skills/find-unknowns/references/ledger-contract.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/.claude/skills/find-unknowns/references/example-session.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/.claude/skills/find-unknowns/references/blindspot-pass.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "echo \"=== any manifest/config files anywhere ===\"\nfind . -maxdepth 6 -iname \"package.json\" -o -iname \"pyproject.toml\" -o -iname \"go.mod\" -o -iname \"Cargo.toml\" -o -iname \"*.csproj\" -o -iname \"Gemfile\" 2>/dev/null\necho \"=== any source files at all ===\"\nfind . -not -path \"./.claude/*\" -not -path \"./.git/*\" -type f 2>/dev/null\necho \"=== grep for rate/limit/throttle/bucket anywhere in repo (full git repo, not just workdir) ===\"\ngit -C /workspace/find-unknowns grep -il \"rate.limit\\|throttle\\|token.bucket\\|leaky.bucket\" -- . 2>/dev/null | grep -v \"/.claude/skills/find-unknowns/\" | head -30\necho \"=== done ===\""
+      },
+      {
+        "tool": "Glob",
+        "path": "**/package.json"
+      },
+      {
+        "tool": "Glob",
+        "path": "**/pyproject.toml"
+      },
+      {
+        "tool": "Glob",
+        "path": "**/go.mod"
+      },
+      {
+        "tool": "Grep",
+        "path": "/workspace/find-unknowns"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/.claude/skills/find-unknowns/references/interview.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/.claude/skills/find-unknowns/references/reference-hunt.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/.claude/skills/find-unknowns/references/brainstorm-prototype.md"
+      },
+      {
+        "tool": "ToolSearch",
+        "path": ""
+      },
+      {
+        "tool": "TaskCreate",
+        "path": ""
+      },
+      {
+        "tool": "TaskCreate",
+        "path": ""
+      },
+      {
+        "tool": "TaskCreate",
+        "path": ""
+      },
+      {
+        "tool": "TaskCreate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/.gitignore"
+      },
+      {
+        "tool": "Bash",
+        "path": "mkdir -p notes/unknowns"
+      },
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 2,
+    "text": "Both — I want to proactively stay under whatever budget I set per-endpoint, and also handle 429/Retry-After correctly when the server pushes back anyway. I'd rather not build for only one and get burned by the other."
+  },
+  {
+    "role": "examiner",
+    "turn": 3,
+    "text": "Good, checks out — resolved status has both `technique` and `resolution`, header/id intact.\n\nNext question, **UNK-001**: what language/runtime is this client (and the rest of your codebase) going to be built in, and do you already have an HTTP library in mind, or is that wide open too?",
+    "tool_events": [
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 3,
+    "text": "Go: it's what I'm fastest in, and I'm leaning toward the standard `net/http` client rather than pulling in a third-party HTTP library — I'd rather build the rate limiter on top of something minimal than fight someone else's abstractions."
+  },
+  {
+    "role": "examiner",
+    "turn": 4,
+    "text": "Good, that checks out.\n\nThat answer actually sharpens the next question. Go clients are idiomatically called from multiple goroutines even within a single process — a struct that isn't safe for concurrent use is a much easier trap to fall into in Go than in a language where that's less the default pattern. So, **UNK-005**: do you know whether this client will only ever be called from one goroutine at a time, or should I assume from the start that it needs to be safe for concurrent calls (e.g. a `sync.Mutex` or atomics guarding the limiter's counters)?",
+    "tool_events": [
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 4,
+    "text": "Yeah, assume concurrent from the start. I haven't actually verified single-threaded use anywhere — that's just been a working assumption I never checked, and honestly it's Go, so I'd rather guard the limiter's state properly (mutex or atomics) than bet on something I never confirmed."
+  },
+  {
+    "role": "examiner",
+    "turn": 5,
+    "text": "Good — checks out. Note that resolution correctly *rejects* the assumption rather than confirming it, which is exactly what this route is for.\n\nTwo more before we're done with interview: **UNK-003** — is there a specific external API (or set of them) this client targets, and do you have their documented rate limits (numbers, burst vs. sustained), or is that still unknown too?",
+    "tool_events": [
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 5,
+    "text": "No specific API target yet — this is meant to be a generic HTTP client, not tied to one service. So no, I don't have documented rate limits from any provider to build against; the per-endpoint budgets will be caller-configured, not hardcoded from some API's published numbers."
+  },
+  {
+    "role": "examiner",
+    "turn": 6,
+    "text": "Checks out. One more interview question, then I'll switch technique for the last one.\n\n**UNK-004**: since this is generic (not tied to one API's route table), how should the client identify an \"endpoint\" for budgeting purposes — literal request URL, a caller-supplied template/key (e.g. `\"GET /users/{id}\"`), or something else? This matters because keying on literal URLs with path parameters means the limiter's internal map grows without bound as new IDs show up.",
+    "tool_events": [
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 6,
+    "text": "Endpoint keying should be a caller-supplied string, not the literal URL — something like `\"GET /users/{id}\"` that the caller passes in explicitly. I don't want the limiter trying to infer templates from real requests; that's asking for trouble and unbounded map growth. Caller says what bucket a call belongs to, full stop."
+  },
+  {
+    "role": "examiner",
+    "turn": 7,
+    "text": "Last one, and this is a genuine open decision — nobody's settled it yet, so per the skill this calls for a brainstorm pass instead of a straight question. Here are distinct directions, not variations on one idea:\n\n**A — Reject immediately, non-blocking.** `Allow(key string) bool`. Caller checks before calling; if `false`, caller decides what to do (retry, drop, surface an error). Smallest possible limiter surface, zero opinions baked in — but it pushes all retry/backoff logic onto every caller.\n\n**B — Block until allowed, context-aware.** `Wait(ctx, key string) error`. Blocks the calling goroutine until budget is available, or returns `ctx.Err()` on cancellation/deadline. Convenient — callers don't write their own retry loop — but a burst of concurrent callers can pile up blocked goroutines if nothing bounds concurrency upstream.\n\n**C — Internal bounded queue.** Requests queue up to N deep, served FIFO, reject beyond that depth. Most caller-friendly in theory, but by far the most to get right (fairness, starvation, queue-depth tuning) for a \"minimal, no third-party abstractions\" client.\n\n**D — Both A and B on the same limiter.** Expose `Allow()` for non-blocking checks and `Wait(ctx)` for blocking ones, sharing the same internal token accounting. Caller picks per call site instead of the library forcing one style.\n\nMy recommendation is **D**: it costs almost nothing extra to build (both are thin methods over the same counters you're already guarding with a mutex per UNK-005), it's the shape Go developers already expect from rate limiters in this ecosystem, and it doesn't lock every caller into one behavior. C is the one I'd steer away from — queue fairness bugs are exactly the kind of thing that's cheap to avoid by not building a queue.\n\nWhich direction do you want — D, or something else?",
+    "tool_events": [
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 7,
+    "text": "D works — go with that."
+  },
+  {
+    "role": "examiner",
+    "turn": 8,
+    "text": "All six architecture-impact entries are now terminal (`resolved`), so the pre-phase gate is clear. Quick recap of what's locked in:\n\n- **Scope**: both proactive per-endpoint throttling and 429/Retry-After handling (UNK-002)\n- **Stack**: Go, stdlib `net/http`, no third-party deps (UNK-001)\n- **Target**: generic client, no hardcoded provider limits — caller configures budgets (UNK-003)\n- **Endpoint identity**: caller-supplied bucket key string, never inferred from URLs (UNK-004)\n- **Concurrency**: safe for concurrent use from the start — mutex/atomics guarding limiter state (UNK-005)\n- **Overload behavior**: `Allow(key) bool` + `Wait(ctx, key) error` over shared token accounting (UNK-006)\n\nYou're clear to start implementing.\n\nOne note before you do: you didn't just take my suggestions across the board — five of six decisions came from your own reasoning (stack, scope, target, endpoint keying, concurrency), and only the last (overload behavior) was you picking my recommendation from an open field of options. That's a healthy mix, not a rubber-stamp pattern, so no walkthrough needed here.\n\nTwo optional offers:\n\n1. **The plant** — I can write a small managed block into `CLAUDE.local.md` so that if you (or a future session) hit a forced deviation from this plan while implementing — without this skill being invoked again — it still gets logged to this ledger instead of silently drifting. Requires your explicit yes, and I'd first check `.gitignore` covers `CLAUDE.local.md` (adding it if not, so the plant can't accidentally get committed and bind collaborators who never agreed to it). Want me to set it up?\n2. Since you're building from scratch, want me to also sketch a short **implementation plan** (file/function shape for the limiter) before you start writing code? This is optional and doesn't gate anything.",
+    "tool_events": [
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/.claude/skills/find-unknowns/references/plant.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 8,
+    "text": "Yes to both — set up the plant, and go ahead and sketch the implementation plan too."
+  },
+  {
+    "role": "examiner",
+    "turn": 9,
+    "text": "Good, checks out — ascending ids, correct shape. Now the plan, with the two new decisions at the top since they're what you're most likely to want to redirect:\n\n## Top of plan — react to these\n\n**1. Config mechanism (UNK-007).** `Configure(key string, r Rate) error`, callable anytime, guarded by the same mutex as the counters — not a static map passed once to `New()`. Reasoning: with generic caller-supplied keys (UNK-004), you won't know the full key set upfront. For an unconfigured key, `Allow`/`Wait` return an error (`ErrNotConfigured`) rather than silently defaulting to unlimited — silent-unlimited is exactly the kind of thing that bites you in production.\n\n**2. 429 handling (UNK-008).** Observed and reported, not auto-retried. A `Do(ctx, req, key)` wrapper calls `Wait(ctx, key)` before sending, and on a 429 response parses `Retry-After` into a typed `*RateLimitedError{RetryAfter time.Duration}` instead of retrying internally. Reasoning: auto-retry hides latency spikes inside a call that looks synchronous and cheap, and can compound badly if the caller also retries on error — better to surface the delay and let the caller decide.\n\nLet me know if either of those should go the other way before I record them.\n\n## Bottom of plan — mechanical, optional to skim\n\n- **Files**: `ratelimit/limiter.go` (public `Limiter` type, `Configure`/`Allow`/`Wait`), `ratelimit/bucket.go` (token-bucket math per key), `ratelimit/doer.go` (`Do` wrapper + `Retry-After` parsing, both delay-seconds and HTTP-date forms), `ratelimit/limiter_test.go`\n- **Internal state**: `map[string]*bucket` under `sync.Mutex` (bounded, caller-controlled key set per UNK-004, so a plain mutex+map is fine — no need for `sync.Map`'s extra complexity)\n- **Token bucket**: capacity + refill rate per key, computed lazily from `time.Now()` deltas on each `Allow`/`Wait` call (no background goroutine needed)\n- **`Wait`**: loop on a `time.Timer` computing next-available-time, `select` against `ctx.Done()` for cancellation\n- **Tests**: table-driven bucket math, `go test -race` for the concurrent-access guarantee from UNK-005, context-cancellation test for `Wait`, `Retry-After` parsing (both header formats)",
+    "tool_events": [
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/.gitignore"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/.gitignore"
+      },
+      {
+        "tool": "Bash",
+        "path": "test -f CLAUDE.local.md && echo \"EXISTS\" || echo \"NOT_EXISTS\""
+      },
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/CLAUDE.local.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/.claude/skills/find-unknowns/references/implementation-plan.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 9,
+    "text": "Both of those land the way I'd want. Go ahead and start writing the code."
+  },
+  {
+    "role": "examiner",
+    "turn": 10,
+    "text": "Code's written. Summary of what landed and where:\n\n**`go.mod`** — `module apiclient`, Go 1.22.\n\n**`ratelimit/bucket.go`** — the token-bucket core: capacity + refill rate per key, lazily computed from elapsed time (no background goroutine), guarded by its own mutex.\n\n**`ratelimit/limiter.go`** — `Limiter` (map of key → bucket, guarded by a mutex per UNK-005), `Configure(key, Rate) error` (UNK-007), `Allow(key) (bool, error)` and `Wait(ctx, key) error` (UNK-006, signature corrected per UNK-009), both returning `ErrNotConfigured` for unset keys.\n\n**`ratelimit/doer.go`** — `Do(ctx, req, key) (*http.Response, error)`: waits on budget, sends via the Limiter's own `*http.Client`, and on a 429 returns `*RateLimitedError{RetryAfter, Response}` with `Retry-After` parsed in both the seconds and HTTP-date forms (UNK-002, UNK-008) — never retries internally.\n\n**Tests** — `bucket_test.go` (token math), `limiter_test.go` (config validation, budget consumption, context cancellation, and a `-race`-targeted concurrent-access test for UNK-005), `doer_test.go` (`Retry-After` parsing, 429 → `RateLimitedError`, pass-through on success, `Do` blocking on exhausted budget).\n\n**What I couldn't do**: verify any of this actually compiles or passes. Every `go build`/`go vet`/`go test` invocation was blocked by this session's Bash permission gate (plain shell commands went through fine, `go` specifically didn't, even on retry) — logged as **UNK-010** (`deviated`) rather than silently asserting the code works. Please either:\n- run `go build ./...`, `go vet ./...`, and `go test -race ./...` yourself, or\n- let me know if you can grant Bash approval for `go` commands and I'll retry in-session.\n\nThe ledger (`notes/unknowns/api-client-rate-limiting-20260723.md`) now has 10 entries, all terminal — nothing `open`/`investigating`, so the quiz generation gate isn't blocked whenever you want to run `/find-unknowns quiz` to close this out. One thing worth being upfront about for that: the quiz checks your understanding of what got *decided* (the ledger), not whether the code you're about to test actually matches those decisions — that verification is still on you.",
+    "tool_events": [
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskCreate",
+        "path": ""
+      },
+      {
+        "tool": "Bash",
+        "path": "go version"
+      },
+      {
+        "tool": "Bash",
+        "path": "go version"
+      },
+      {
+        "tool": "Bash",
+        "path": "go version"
+      },
+      {
+        "tool": "Bash",
+        "path": "pwd"
+      },
+      {
+        "tool": "Bash",
+        "path": "which go && go env GOPATH GOROOT 2>&1"
+      },
+      {
+        "tool": "Bash",
+        "path": "which go"
+      },
+      {
+        "tool": "Bash",
+        "path": "go version"
+      },
+      {
+        "tool": "Bash",
+        "path": "ls"
+      },
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/go.mod"
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/ratelimit/bucket.go"
+      },
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/ratelimit/limiter.go"
+      },
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/ratelimit/doer.go"
+      },
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/ratelimit/bucket_test.go"
+      },
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/ratelimit/limiter_test.go"
+      },
+      {
+        "tool": "Write",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/ratelimit/doer_test.go"
+      },
+      {
+        "tool": "Bash",
+        "path": "go build ./... && go vet ./... && go test -race ./..."
+      },
+      {
+        "tool": "Bash",
+        "path": "go build ./..."
+      },
+      {
+        "tool": "Bash",
+        "path": "go build ./..."
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      }
+    ]
+  }
+]

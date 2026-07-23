@@ -36,6 +36,22 @@ If a previously `accepted-risk` entry's risk is what materialized, still create 
 `deviated` entry (v1 records them as separate entries; a back-reference link is
 documented future work) — and say in conversation which accepted risk just came due.
 
+## Deviation vs correction
+
+Route by **when reality diverged from the record**, not by who noticed or how politely:
+
+- The recorded resolution was **right when written, and reality moved later** — an API
+  removed, a dependency dropped, a constraint surfaced → `status: deviated`, via the
+  rail above. This holds even when the user announces the change and approves the new
+  direction in conversation; visibility does not reclassify it.
+- The recorded content was **already wrong at write time** — a misheard decision, a
+  wrong fact → the correction protocol: a new entry with `supersedes: UNK-NNN`
+  (references/ledger-contract.md), not a `deviated` status.
+
+Replacing an invalidated decision with a fresh `resolved` entry hides the fork: the
+`deviated` entry is what records that plan and build diverged, and it is what the
+post-phase quiz probes hardest.
+
 ## What the quiz does with these
 
 Every `deviated` entry gets at least one quiz question (references/quiz.md) — deviations

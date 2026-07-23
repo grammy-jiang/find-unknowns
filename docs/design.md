@@ -750,6 +750,49 @@ deviation variants (skill-invoked and plant-only). Verified: 70 unit tests green
 model calls are the maintainer's to spend, and evals stay out of CI except the free
 --dry-run smoke.)*
 
+*(Execution note 5, 2026-07-23: first LIVE matrix run, maintainer-authorized. 8/12
+first-pass (C1, CORR1, D1, DEG1, DEV3, Q1, Q2, Q3 — including both anti-gaming quiz
+cells and the plant-only deviation cell with a verified memory load). Four findings,
+each landed as a durable change per the maintenance rule:*
+
+- *L1 (DEV1, real skill gap): a user-announced forced deviation ("the API you planned
+  on was removed") was recorded as a `supersedes:` correction with a fresh `resolved`
+  entry instead of `status: deviated` — the deterministic grader caught what the judge
+  (EBM=true) did not, which is exactly the division of labor the harness was designed
+  for. Fix: deviation-vs-correction disambiguation added as a rail in SKILL.md, a
+  section in deviation-log.md, and a routing sentence atop ledger-contract.md's
+  correction protocol: route by WHEN reality diverged — wrong-when-written ⇒ supersede;
+  right-then-reality-moved ⇒ deviated, even when the user announces it.*
+- *L2 (DEV2, harness defect): egress damping pointed the examiner's OWN model-API
+  traffic at the dead proxy — in a managed-egress environment (parent HTTPS_PROXY) the
+  cell dies before turn 1 (rc=1, empty stderr). Fix: `_damping_mode()` skips damping
+  under a managed proxy and records the skip in the cell record (`egress_damping`,
+  no-silent-caps); in direct-egress environments the dead proxy now carves out the
+  API hosts via NO_PROXY.*
+- *L3 (G1, scenario defect — and a good sign): the cell seeded no code, so the
+  grounding rail correctly found "no session storage exists here" and the examiner
+  refused three always-accept pushes to invent it — honest, but the deference flow the
+  cell measures never started. Fix: workdir_fixtures seed a minimal express-session
+  MemoryStore app so the migration premise is grounded.*
+- *L4 (P1, real skill gap + narrow grader): a corrupted plant (orphaned BEGIN) was
+  never noticed at invocation — the scripted persona had to ask for the rebuild, and
+  the rebuild (itself correct: re-derived from disk) never named the defect. Fix:
+  "plant integrity first" check added to SKILL.md dispatch; plant.md recovery step 2
+  now requires naming the defect concretely before rebuilding; the grader's surfacing
+  predicate accepts named defects (orphaned/duplicate/missing + marker mention), with
+  a unit test.*
+
+*Re-runs: DEV1, G1, P1 green immediately (the deviation now lands as `status: deviated`
+with the fork surfaced; the grounded G1 premise reaches the deference flag + withheld
+go-ahead; the P1 examiner names the orphaned-BEGIN defect before rebuilding). DEV2's
+re-run surfaced one more finding: L5 (grader blind spot) — the examiner encountered the
+seeded contradiction via Bash (`cat src/app.py`, `git log -p`) and Edit, never the Read
+tool, so `evidence_of_encounter` false-failed a behaviorally correct run (deviation
+surfaced + recorded, judge confirmed). Fix: encounter widened to Read / Bash-mentioning
+/ Edit of the stub, ordering requirement kept, unit-tested. Final DEV2 re-run green.
+End state: 12/12 cells confirmed green live; the managed-proxy damping skip is recorded
+in DEV2's record as `egress_damping: skipped-managed-proxy`.)*
+
 1. **Walking skeleton, no packaging:** author SKILL.md (thin: intake, dispatch rule,
    routing table + assumption procedure, gate conditions, rails, frontmatter as drafted) +
    the **8 load-bearing references** (blindspot-pass, interview, reference-hunt,

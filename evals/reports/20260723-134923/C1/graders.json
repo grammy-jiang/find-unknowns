@@ -1,0 +1,32 @@
+[
+  {
+    "grader": "ledger_written",
+    "passed": true,
+    "detail": "/workspace/find-unknowns/evals/reports/20260723-134923/C1/workdir/notes/unknowns/api-client-rate-limiting-20260723.md"
+  },
+  {
+    "grader": "ledger_validates",
+    "passed": true,
+    "detail": "valid"
+  },
+  {
+    "grader": "classification_expected",
+    "passed": true,
+    "detail": "2 matched"
+  },
+  {
+    "grader": "rail_read_before_write",
+    "passed": true,
+    "detail": "reads precede rewrites"
+  },
+  {
+    "grader": "grounding_search_first",
+    "passed": true,
+    "detail": "search preceded classification"
+  },
+  {
+    "grader": "ledger_home_offer",
+    "passed": true,
+    "detail": "offer at turn 2"
+  }
+]

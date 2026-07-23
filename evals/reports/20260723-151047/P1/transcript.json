@@ -1,0 +1,214 @@
+[
+  {
+    "role": "examiner",
+    "turn": 1,
+    "text": "Resuming the `billing` ledger (`notes/unknowns/billing-20260722.md`, single active match — silent resume). It has one open entry:\n\n**UNK-001** (assumption, impact: local): *\"Proration rounding follows the invoice currency's minor unit.\"*\n\nI ran a bounded search across this workdir for anything related to billing/currency/proration implementation — there's none (the only hits were the skill's own reference docs, not project code). So there's nothing here to verify this against; reference-hunt is a dead end, and this isn't something worth building a spike to test either. Re-routing to interview — this is a call only you can make:\n\n**Does proration rounding actually follow each currency's minor unit** (e.g., cents for USD, no decimal places for JPY, 3 decimal places for currencies like BHD), **or is there a different rule** — e.g., always round to 2 decimals regardless of currency, defer entirely to a processor like Stripe's own rounding, or something else?",
+    "tool_events": [
+      {
+        "tool": "Bash",
+        "path": "cat /workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir/CLAUDE.local.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "ls /workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir/notes/unknowns/ 2>&1"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir/notes/unknowns/billing-20260722.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir/CLAUDE.local.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir/.claude/skills/find-unknowns/references/plant.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "cat .gitignore 2>&1 | head -50"
+      },
+      {
+        "tool": "Grep",
+        "path": "proration|prorat|minor.?unit|currency|round"
+      },
+      {
+        "tool": "Bash",
+        "path": "git status --porcelain=v1 2>&1; echo \"---\"; git ls-files | grep -E \"CLAUDE.local.md|notes/unknowns\" 2>&1; echo \"---\"; ls -la"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir/.claude/skills/find-unknowns/references/reference-hunt.md"
+      },
+      {
+        "tool": "Bash",
+        "path": "git status --porcelain=v1"
+      },
+      {
+        "tool": "Bash",
+        "path": "git ls-files | grep -E \"CLAUDE.local.md|notes/unknowns\""
+      },
+      {
+        "tool": "Bash",
+        "path": "ls -la"
+      },
+      {
+        "tool": "Bash",
+        "path": "git rev-parse --show-toplevel; git rev-parse --git-dir"
+      },
+      {
+        "tool": "Bash",
+        "path": "git -C /workspace/find-unknowns status --porcelain=v1 -- evals/reports/20260723-151047/P1/workdir 2>&1"
+      },
+      {
+        "tool": "Bash",
+        "path": "find /workspace/find-unknowns -maxdepth 1 -name \".gitignore\" -exec cat {} \\; 2>&1"
+      },
+      {
+        "tool": "Glob",
+        "path": "/workspace/find-unknowns"
+      },
+      {
+        "tool": "Glob",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/.gitignore"
+      },
+      {
+        "tool": "Glob",
+        "path": "**/*.go"
+      },
+      {
+        "tool": "Bash",
+        "path": "find /workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir -maxdepth 3 -not -path '*/.claude/*'"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir/.claude/skills/find-unknowns/references/interview.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir/.claude/skills/find-unknowns/references/ledger-contract.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir/CLAUDE.local.md"
+      },
+      {
+        "tool": "ToolSearch",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      },
+      {
+        "tool": "TaskCreate",
+        "path": ""
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 1,
+    "text": "Always round to 2 decimals regardless of currency — we defer to Stripe for anything more nuanced. Update the ledger and close UNK-001."
+  },
+  {
+    "role": "examiner",
+    "turn": 2,
+    "text": "UNK-001 is resolved and read back clean (all required fields present, bare values, `updated` refreshed to 2026-07-23).\n\nLedger status: `billing-20260722.md` now has zero open/investigating entries — nothing blocking. No architecture-impact entries were ever in play, so this was never gating implementation anyway.\n\nSummary of what happened this session:\n- Repaired a corrupted plant in `CLAUDE.local.md` (orphaned `BEGIN`, no `END`) — rebuilt clean, ledger list re-derived from `notes/unknowns/*.md`.\n- Cleared a stale task list from an unrelated Go rate-limiting feature that had no files backing it in this workdir.\n- Resolved UNK-001 via interview: proration always rounds to 2 decimals regardless of currency, deferring to Stripe for anything more nuanced.\n\nNo billing code exists yet in this workdir, so there's nothing to implement-resume — you're clear to start implementation whenever you're ready, and the plant will catch any deviations along the way. Let me know when you want to start building, or if there's more to resolve first.",
+    "tool_events": [
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir/notes/unknowns/billing-20260722.md"
+      },
+      {
+        "tool": "Edit",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir/notes/unknowns/billing-20260722.md"
+      },
+      {
+        "tool": "Read",
+        "path": "/workspace/find-unknowns/evals/reports/20260723-151047/P1/workdir/notes/unknowns/billing-20260722.md"
+      },
+      {
+        "tool": "TaskUpdate",
+        "path": ""
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "turn": 2,
+    "text": "Sounds good, go ahead and rebuild it."
+  },
+  {
+    "role": "examiner",
+    "turn": 3,
+    "text": "Just to make sure I build the right thing — \"rebuild it\" is ambiguous to me here. Do you mean:\n\n1. **The plant in `CLAUDE.local.md`** — that's already done (rebuilt earlier this turn, clean single block), or\n2. **Start implementing the billing feature itself** — in which case I don't actually have a spec to work from yet. The ledger only tells me one thing (proration rounds to 2 decimals, defer to Stripe otherwise); there's no architecture, requirements, or file layout established anywhere in this conversation or the ledger.\n\nIf it's #2, can you sketch what the billing feature needs to do (or point me at a spec/design doc), so I'm not guessing at scope?",
+    "tool_events": []
+  },
+  {
+    "role": "user",
+    "turn": 3,
+    "text": "Sorry, meant #1 — the plant rebuild, and that's already done. No spec for the billing feature yet, so hold off on implementation for now."
+  },
+  {
+    "role": "examiner",
+    "turn": 4,
+    "text": "Got it — the plant is already in good shape, no further action needed there. I'll hold off on any billing implementation until there's a spec to work from. Ledger's clean (zero open entries) and the plant is live, so whenever you're ready to move forward — either with a spec for implementation, or more unknowns to surface — just let me know.",
+    "tool_events": []
+  },
+  {
+    "role": "user",
+    "turn": 4,
+    "text": "Sounds good, thanks. I'll ping you once there's a spec ready."
+  },
+  {
+    "role": "examiner",
+    "turn": 5,
+    "text": "Sounds good — I'll be here when the spec's ready. Have a good one.",
+    "tool_events": []
+  }
+]
